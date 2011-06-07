@@ -3,9 +3,13 @@ html(lang='utf-8')
 	head
 		title='The 11th JCO'
 		script(src='/socket.io/socket.io.js')
-		script(src='http://code.jquery.com/jquery-1.6.1.min.js')
+		script(src='/javascripts/jquery-1.6.1.min.js')
+		script(src='/javascripts/jquery-ui-1.8.13.custom.min.js')
 		script(type='text/javascript')
 			$(function(){
+				$(".buttons").buttonset();
+				$("button").button();
+				
 				var socket = new io.Socket(null, {port: #{port}, rememberTransport:false});
 				socket.connect();
 				socket.send({'type':'subscribe', 'channel':'#{p_id}'});
@@ -22,15 +26,16 @@ html(lang='utf-8')
 					socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{username}', 'emotion':msg_emotion}});
 				});
 				
-				$('.feedbacks button').click(function(){
+				$('.buttons input').click(function(){
 					var emotion = $(this).attr('emotion');
-					var list = $(this).next('ul');
+					var list = $("#rt_feedbacks");
+				
+					$.each($(this).siblings('input'), function(){
+						$(this).next().removeClass('ui-state-active');
+					})
+					
 					$.getJSON('/comments/', {'to':'#{p_id}', 'emotion':emotion}, function(data){
-						console.log(list);
-						//clear
 						list.empty();
-						
-						//append
 						$.each(data, function(index, message){
 							list.append("<li>[" + message.from + "]님은 " + message.emotion + ' "' + message.body +  '"</li>');
 						});
@@ -38,33 +43,37 @@ html(lang='utf-8')
 				});
 				
 			});
-	body
-		h1 #{title}
-		p feedbacks
-		ul(id='rt_feedbacks')
-		select(id='emotion')
-			option(value='불만이 있습니다.') 불만입니다.
-			option(value='다르게 생각합니다.') 이의있습니다.
-			option(value='좋아합니다.', selected=true) 좋습니다.
-			option(value='공감하고 있습니다.') 공감합니다.
-			option(value='궁금해 합니다.') 궁금합니다.
-		input(id='comment', name='comment', autocomplete='off', size='50')
-		button(id='send_comment') Send
-		div(class='feedbacks')
-			button(id='show_all_comment') 모두 보기
-			ul(id='all_feedbacks')
-		div(class='feedbacks')
-			button(id='show_dis_comment', emotion='불만이 있습니다.') 불만 보기
-			ul(id='dis_feedbacks')
-		div(class='feedbacks')
-			button(id='show_diff_comment', emotion='다르게 생각합니다.') 이견 보기
-			ul(id='diff_feedbacks')
-		div(class='feedbacks')
-			button(id='show_like_comment', emotion='좋아합니다.') 호감 보기
-			ul(id='like_feedbacks')
-		div(class='feedbacks')
-			button(id='show_same_comment', emotion='공감하고 있습니다.') 공감 보기
-			ul(id='same_feedbacks')
-		div(class='feedbacks')
-			button(id='show_que_comment', emotion='궁금해 합니다.') 질문 보기
-			ul(id='que_feedbacks')
+	body(id='chat_body')
+		div(id='title_bar')
+			p #{username}의 feedbacks #{title}
+		div(id='chat_box')
+			ul(id='rt_feedbacks')
+			div(id='statics_bar')
+				ul
+					li 불만X0
+					li 이견X0
+					li 호감X0
+					li 동감X0
+					li 질문X0
+		div(id="input_bar")
+			select(id='emotion')
+				option(value='불만이 있습니다.') 불만입니다.
+				option(value='다르게 생각합니다.') 이의있습니다.
+				option(value='좋아합니다.', selected=true) 좋습니다.
+				option(value='공감하고 있습니다.') 공감합니다.
+				option(value='궁금해 합니다.') 궁금합니다.
+			input(id='comment', name='comment', autocomplete='off', size='50')
+			button(id='send_comment') Send
+			div(class='buttons')
+				input(type='radio',id='show_all_comment')
+				label(for='show_all_comment') 모두 보기
+				input(type='radio',id='show_dis_comment', emotion='불만이 있습니다.')
+				label(for='show_dis_comment') 불만 보기
+				input(type='radio',id='show_diff_comment', emotion='다르게 생각합니다.')
+				label(for='show_diff_comment') 이견 보기
+				input(type='radio',id='show_like_comment', emotion='좋아합니다.')
+				label(for='show_like_comment') 호감 보기
+				input(type='radio',id='show_same_comment', emotion='공감하고 있습니다.')
+				label(for='show_same_comment') 질문 보기
+				input(type='radio',id='show_que_comment', emotion='궁금해 합니다.')
+				label(for='show_que_comment') 질문 보기

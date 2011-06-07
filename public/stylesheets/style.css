@@ -1,8 +1,50 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+p {
+	margin: 0px;
 }
-
+body {
+	padding: 20px;
+	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
 a {
-  color: #00B7FF;
+	color: #00B7FF;
+}
+.ui-button {
+	font-size: 0.8em;
+	font-weight: normal;
+}
+#chat_body {
+	width: 550px;
+	background-color: grey;
+}
+#title_bar {
+	width: 550px;
+	padding: 5px;
+	background-color: lightgrey;
+}
+#chat_box {
+	width: 560px;
+}
+#rt_feedbacks {
+	width: 385px;
+	height: 250px;
+	padding: 5px;
+	background-color: white;
+	float: left;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-right: 5px;
+}
+#statics_bar {
+	width: 150px;
+	height: 250px;
+	padding: 5px;
+	padding-right: 0;
+	background-color: lightyellow;
+	float: right;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	
+}
+#input_bar {
+	clear: both;
 }
