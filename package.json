@@ -3,6 +3,8 @@
   , "version": "0.0.1"
   , "private": true
   , "dependencies": {
-    "jade": ">= 0.0.1"
+    "jade": ">= 0.0.1",
+	"express": ">=2.3.0",
+	"socket.io": ">=0.6.0"
   }
 }

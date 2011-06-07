@@ -1,9 +1,33 @@
-h1='가나다라마사아....'
-p #{p_id}
-ul
-form(method='post', action='/comment')
-	label #{email}: 
-		input(name='comment')
-	input(type='submit', value='Say')
+!!! 5
+html(lang='utf-8')
+	head
+		title='The 11th JCO'
+		script(src='/socket.io/socket.io.js')
+		script(src='http://code.jquery.com/jquery-1.6.1.min.js')
+		script(type='text/javascript')
+			$(function(){
+				var socket = new io.Socket(null, {port: #{port}, rememberTransport:false});
+				socket.connect();
+				socket.send({'type':'subscribe', 'channel':'#{p_id}'});
+				socket.on('message', function(obj){
+					console.log(obj);
+					console.log('I got you: ' + obj.message);
+					$("#feedbacks").append("<li>" + obj.from + ": " + obj.message + "</li>")
+					$("#comment").attr('value', '');
+				});
+				$('#send_comment').click(function(){
+					var val = document.getElementById('comment').value;
+					socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':val, 'from':'#{email}'});
+					console.log(val);
+				});
+				
+			});
+	body
+		h1 #{title}
+		p feedbacks
+		ul(id='feedbacks')
+		label #{email}: 
+			input(id='comment', name='comment', autocomplete='off')
+		button(id='send_comment') Send
 
 	

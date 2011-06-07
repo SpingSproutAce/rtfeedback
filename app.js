@@ -1,11 +1,44 @@
-
 /**
  * Module dependencies.
  */
 
-var express = require('express');
+var express = require('express'),
+	io = require('socket.io'),
+	models = require('./lib/models'),
+	Comments = models.Comments;
 
 var app = module.exports = express.createServer();
+
+var socket = io.listen(app);
+
+var host=process.env.VCAP_APP_HOST || 'localhost';
+var port=process.env.VCAP_APP_PORT || 3000;
+
+// HashMap
+var HashMap = function(){   
+    this.map = new Array();
+};   
+HashMap.prototype = {   
+    put : function(key, value){   
+        this.map[key] = value;
+    },   
+    get : function(key){   
+        return this.map[key];
+    },   
+    getAll : function(){   
+        return this.map;
+    },   
+    clear : function(){   
+        this.map = new Array();
+    },   
+    getKeys : function(){   
+        var keys = new Array();   
+        for(i in this.map){   
+            keys.push(i);
+        }   
+        return keys;
+    }
+};
 
 // Configuration
 
@@ -22,13 +55,58 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-  app.set('connstring', 'mongodb://localhost/rtfeed-dev')
 });
 
 app.configure('production', function(){
   app.use(express.errorHandler());
-  app.set('connstring', 'mongodb://localhost/rtfeeed'); 
 });
+
+// Socket IO
+
+var channelMap = new HashMap();
+socket.on('connection', function(client){
+	var clientSessionId = client.sessionId;
+	client.on('message', function(message){
+		console.log(message);
+		
+		var channel = message.channel;
+		var action = message.type;
+		var msg = message.msg;
+		var from = message.from;
+		if(action === 'subscribe'){
+			var clientList = channelMap.get(channel);
+			if(!clientList) {
+				// console.log("empty");
+				var clientList = new Array();
+				clientList[clientSessionId] = client;
+				channelMap.put(channel, clientList);
+			} else {
+				clientList[clientSessionId] = client;
+			}
+			console.log(clientList[clientSessionId] === client);
+		} else if(action === 'publish') {
+			// save
+			var newComments = new Comments();
+			newComments.to = channel;
+			newComments.from = from;
+			newComments.body = msg;
+			newComments.date = new Date();
+			newComments.save(function(err){
+				console.log(err);
+			});
+			
+			// publish
+			var clientList = channelMap.get(channel);
+			for(var i in clientList) {
+				clientList[i].send({message:msg, from:from});
+			}
+		}		
+	});
+	client.on('disconnection', function(){
+		
+	});
+});
+
 
 // Routes
 app.get('/', function(req, res){
@@ -49,10 +127,9 @@ app.get('/list', function(req, res){
 	res.render('list', {'email':req.session.email});
 });
 
-app.get('/p/:id', function(req, res){
-	console.log(req.params.id);
-	res.render('presentation', {'email':req.session.email, 'p_id':req.params.id});
+app.get('/p/:id/:title', function(req, res){
+	res.render('presentation', {'port':port, 'email':req.session.email, 'p_id':req.params.id, 'title':req.params.title});
 });
 
-app.listen(3000);
+app.listen(port);
 console.log("Express server listening on port %d", app.address().port);
