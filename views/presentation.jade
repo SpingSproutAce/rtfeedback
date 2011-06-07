@@ -13,22 +13,21 @@ html(lang='utf-8')
 					var message = obj.msg;
 					console.log(obj);
 					console.log('I got you: ' + message);
-					$("#feedbacks").append("<li>[" + message.from + "]님은 " + message.emotion + ' "' + message.body +  '"</li>');
+					$("#rt_feedbacks").append("<li>[" + message.from + "]님은 " + message.emotion + ' "' + message.body +  '"</li>');
 					$("#comment").attr('value', '');
 				});
 				$('#send_comment').click(function(){
-					var msg_body = $('#comment').attr('value');
-					var msg_emotion = $('#emotion :selected').attr('value');
-					socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{email}', 'emotion':msg_emotion}});
+					var msg_body = $('#comment').val();
+					var msg_emotion = $('#emotion :selected').val();
+					socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{username}', 'emotion':msg_emotion}});
 					console.log(msg_body);
 					console.log(msg_emotion);
 				});
-				
 			});
 	body
 		h1 #{title}
 		p feedbacks
-		ul(id='feedbacks')
+		ul(id='rt_feedbacks')
 		select(id='emotion')
 			option(value='불만이 있습니다.') 불만입니다.
 			option(value='다르게 생각합니다.') 이의있습니다.
@@ -37,5 +36,6 @@ html(lang='utf-8')
 			option(value='궁금해 합니다.') 궁금합니다.
 		input(id='comment', name='comment', autocomplete='off', size='50')
 		button(id='send_comment') Send
-
-	
+		div
+			button(id='show_all_comment') 모두 보기
+			ul(id='all_feedbacks')

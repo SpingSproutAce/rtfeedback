@@ -89,6 +89,7 @@ socket.on('connection', function(client){
 			newComments.to = channel;
 			newComments.from = msg.from;
 			newComments.body = msg.body;
+			newComments.emotion = msg.emotion;
 			newComments.date = new Date();
 			newComments.save(function(err){
 				console.log(err);
@@ -113,21 +114,21 @@ app.get('/', function(req, res){
 });
 
 app.post('/login', function(req, res){
-	var email = req.body.email;	
-	console.log(email);
-	// validate email
+	var username = req.body.username;	
+	console.log(username);
+	// validate username
 	// if it has error, return to the form with the error message.
-	req.session.email = email;
+	req.session.username = username;
 	res.redirect('list');
 });
 
 app.get('/list', function(req, res){
 	// get the presentation list
-	res.render('list', {'email':req.session.email});
+	res.render('list', {'email':req.session.username});
 });
 
 app.get('/p/:id/:title', function(req, res){
-	res.render('presentation', {'port':port, 'email':req.session.email, 'p_id':req.params.id, 'title':req.params.title});
+	res.render('presentation', {'port':port, 'username':req.session.username, 'p_id':req.params.id, 'title':req.params.title});
 });
 
 app.listen(port);
