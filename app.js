@@ -72,7 +72,6 @@ socket.on('connection', function(client){
 		var channel = message.channel;
 		var action = message.type;
 		var msg = message.msg;
-		var from = message.from;
 		if(action === 'subscribe'){
 			var clientList = channelMap.get(channel);
 			if(!clientList) {
@@ -88,8 +87,8 @@ socket.on('connection', function(client){
 			// save
 			var newComments = new Comments();
 			newComments.to = channel;
-			newComments.from = from;
-			newComments.body = msg;
+			newComments.from = msg.from;
+			newComments.body = msg.body;
 			newComments.date = new Date();
 			newComments.save(function(err){
 				console.log(err);
@@ -98,7 +97,7 @@ socket.on('connection', function(client){
 			// publish
 			var clientList = channelMap.get(channel);
 			for(var i in clientList) {
-				clientList[i].send({message:msg, from:from});
+				clientList[i].send({'msg':msg});
 			}
 		}		
 	});
