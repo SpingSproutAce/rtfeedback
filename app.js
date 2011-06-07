@@ -92,7 +92,7 @@ socket.on('connection', function(client){
 			newComments.emotion = msg.emotion;
 			newComments.date = new Date();
 			newComments.save(function(err){
-				console.log(err);
+				//console.log(err);
 			});
 			
 			// publish
@@ -124,7 +124,14 @@ app.post('/login', function(req, res){
 
 app.get('/list', function(req, res){
 	// get the presentation list
-	res.render('list', {'email':req.session.username});
+	res.render('list', {'username':req.session.username});
+});
+
+app.get('/comments', function(req, res){
+	res.contentType('application/json');
+	var commentList = Comments.find(req.query, function(err, docs){
+		res.send(docs);
+	});
 });
 
 app.get('/p/:id/:title', function(req, res){

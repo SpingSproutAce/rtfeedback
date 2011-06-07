@@ -20,9 +20,23 @@ html(lang='utf-8')
 					var msg_body = $('#comment').val();
 					var msg_emotion = $('#emotion :selected').val();
 					socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{username}', 'emotion':msg_emotion}});
-					console.log(msg_body);
-					console.log(msg_emotion);
 				});
+				
+				$('.feedbacks button').click(function(){
+					var emotion = $(this).attr('emotion');
+					var list = $(this).next('ul');
+					$.getJSON('/comments/', {'to':'#{p_id}', 'emotion':emotion}, function(data){
+						console.log(list);
+						//clear
+						list.empty();
+						
+						//append
+						$.each(data, function(index, message){
+							list.append("<li>[" + message.from + "]님은 " + message.emotion + ' "' + message.body +  '"</li>');
+						});
+					});
+				});
+				
 			});
 	body
 		h1 #{title}
@@ -36,6 +50,21 @@ html(lang='utf-8')
 			option(value='궁금해 합니다.') 궁금합니다.
 		input(id='comment', name='comment', autocomplete='off', size='50')
 		button(id='send_comment') Send
-		div
+		div(class='feedbacks')
 			button(id='show_all_comment') 모두 보기
 			ul(id='all_feedbacks')
+		div(class='feedbacks')
+			button(id='show_dis_comment', emotion='불만이 있습니다.') 불만 보기
+			ul(id='dis_feedbacks')
+		div(class='feedbacks')
+			button(id='show_diff_comment', emotion='다르게 생각합니다.') 이견 보기
+			ul(id='diff_feedbacks')
+		div(class='feedbacks')
+			button(id='show_like_comment', emotion='좋아합니다.') 호감 보기
+			ul(id='like_feedbacks')
+		div(class='feedbacks')
+			button(id='show_same_comment', emotion='공감하고 있습니다.') 공감 보기
+			ul(id='same_feedbacks')
+		div(class='feedbacks')
+			button(id='show_que_comment', emotion='궁금해 합니다.') 질문 보기
+			ul(id='que_feedbacks')
