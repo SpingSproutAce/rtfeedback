@@ -93,3 +93,14 @@ a {
 .que {
 	background-color: #4176ab;
 }
+/* */
+div.header{
+  margin-bottom:20px;
+}
+div.article{
+  padding:20px 0 10px 0;
+}
+div.footer{
+  color:#555;
+  font-size:12px;
+}
