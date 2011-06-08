@@ -88,6 +88,12 @@ html(lang='utf-8')
 					$("#rt_feedbacks").empty();
 				});
 				
+				$('#comment').keypress(function(event){
+					if(event.which == '13') {
+						$('#send_comment').click();
+					}
+				});
+				
 			});
 	body(id='chat_body')
 		div(id='title_bar')
