@@ -107,7 +107,6 @@ socket.on('connection', function(client){
 	});
 });
 
-
 // Routes
 app.get('/', function(req, res){
 	res.render('index');
@@ -115,11 +114,12 @@ app.get('/', function(req, res){
 
 app.post('/login', function(req, res){
 	var username = req.body.username;	
-	console.log(username);
-	// validate username
-	// if it has error, return to the form with the error message.
-	req.session.username = username;
-	res.redirect('list');
+	if(!username){
+		res.render('index', {'error':'입력해주시옵소서...'});
+	} else {
+		req.session.username = username;
+		res.redirect('list');
+	}
 });
 
 app.get('/list', function(req, res){
