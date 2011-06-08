@@ -6,7 +6,13 @@ html(lang='utf-8')
 		script(src='/javascripts/jquery-1.6.1.min.js')
 		script(src='/javascripts/jquery-ui-1.8.13.custom.min.js')
 		script(type='text/javascript')
-			$(function(){
+			$(function(){			
+				var disText = '불만이 있습니다.';
+				var diffText = '다르게 생각합니다.';
+				var likeText = '좋아합니다.';
+				var sameText = '공감하고 있습니다.';
+				var queText = '궁금해 합니다.';
+				
 				$(".buttons").buttonset();
 				$("button").button();
 				
@@ -15,24 +21,43 @@ html(lang='utf-8')
 				socket.send({'type':'subscribe', 'channel':'#{p_id}'});
 				socket.on('message', function(obj){
 					var message = obj.msg;
-					console.log(obj);
-					console.log('I got you: ' + message);
+					var countTag;
+					
+					// count up specific tag count
+					switch(message.emotion) {
+						case disText: countTag = $(".dis").next().next('.tag-count'); break;
+						case diffText: countTag = $(".diff").next().next('.tag-count'); break;
+						case likeText: countTag = $(".like").next().next('.tag-count'); break;
+						case sameText: countTag = $(".same").next().next('.tag-count'); break;
+						case queText: countTag = $(".que").next().next('.tag-count'); break;
+						default: break;
+					}
+					var count = countTag.text();
+					count++;
+					countTag.text(count);
+					
+					// count up total tag count
+					var totalTag = $(".all").next().next('.tag-count');
+					count = totalTag.text();
+					count++;
+					totalTag.text(count);
+					
+					// add message
 					$("#rt_feedbacks").append("<li>[" + message.from + "]님은 " + message.emotion + ' "' + message.body +  '"</li>');
 					$("#comment").attr('value', '');
 				});
 				$('#send_comment').click(function(){
 					var msg_body = $('#comment').val();
 					var msg_emotion = $('#emotion :selected').val();
+					if(!msg_body) {
+						return;
+					}
 					socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{username}', 'emotion':msg_emotion}});
 				});
 				
-				$('.buttons input').click(function(){
+				$('.tag').click(function(){
 					var emotion = $(this).attr('emotion');
 					var list = $("#rt_feedbacks");
-				
-					$.each($(this).siblings('input'), function(){
-						$(this).next().removeClass('ui-state-active');
-					})
 					
 					$.getJSON('/comments/', {'to':'#{p_id}', 'emotion':emotion}, function(data){
 						list.empty();
@@ -42,6 +67,8 @@ html(lang='utf-8')
 					});
 				});
 				
+				
+				
 			});
 	body(id='chat_body')
 		div(id='title_bar')
@@ -50,11 +77,30 @@ html(lang='utf-8')
 			ul(id='rt_feedbacks')
 			div(id='statics_bar')
 				ul
-					li 불만X0
-					li 이견X0
-					li 호감X0
-					li 동감X0
-					li 질문X0
+					li 
+						span(class='tag dis', emotion='불만이 있습니다.') 불만
+						span(class='between-tag-count') X 
+						span(class='tag-count') #{disCount}
+					li 
+						span(class='tag diff', emotion='다르게 생각합니다.') 이견 
+						span(class='between-tag-count') X 
+						span(class='tag-count') #{diffCount}
+					li 
+						span(class='tag like', emotion='좋아합니다.') 호감 
+						span(class='between-tag-count') X 
+						span(class='tag-count') #{likeCount}
+					li 
+						span(class='tag same', emotion='공감하고 있습니다.') 동감 
+						span(class='between-tag-count') X 
+						span(class='tag-count') #{sameCount}
+					li 
+						span(class='tag que', emotion='궁금해 합니다.') 질문 
+						span(class='between-tag-count') X 
+						span(class='tag-count') #{queCount}
+					li 
+						span(class='tag all') 전체 
+						span(class='between-tag-count') X 
+						span(class='tag-count') #{allCount}
 		div(id="input_bar")
 			select(id='emotion')
 				option(value='불만이 있습니다.') 불만입니다.
@@ -64,16 +110,3 @@ html(lang='utf-8')
 				option(value='궁금해 합니다.') 궁금합니다.
 			input(id='comment', name='comment', autocomplete='off', size='50')
 			button(id='send_comment') Send
-			div(class='buttons')
-				input(type='radio',id='show_all_comment')
-				label(for='show_all_comment') 모두 보기
-				input(type='radio',id='show_dis_comment', emotion='불만이 있습니다.')
-				label(for='show_dis_comment') 불만 보기
-				input(type='radio',id='show_diff_comment', emotion='다르게 생각합니다.')
-				label(for='show_diff_comment') 이견 보기
-				input(type='radio',id='show_like_comment', emotion='좋아합니다.')
-				label(for='show_like_comment') 호감 보기
-				input(type='radio',id='show_same_comment', emotion='공감하고 있습니다.')
-				label(for='show_same_comment') 질문 보기
-				input(type='radio',id='show_que_comment', emotion='궁금해 합니다.')
-				label(for='show_que_comment') 질문 보기

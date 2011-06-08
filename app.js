@@ -135,7 +135,27 @@ app.get('/comments', function(req, res){
 });
 
 app.get('/p/:id/:title', function(req, res){
-	res.render('presentation', {'port':port, 'username':req.session.username, 'p_id':req.params.id, 'title':req.params.title});
+	var to = req.params.id;
+	var disCount, diffCount, likeCount, sameCount, queCount, allCount;
+	Comments.find({'to':to, 'emotion':'불만이 있습니다.'}).count(function(err, count){
+		disCount = count;
+		Comments.find({'to':to, 'emotion':'다르게 생각합니다.'}).count(function(err, count){
+			diffCount = count;
+			Comments.find({'to':to, 'emotion':'좋아합니다.'}).count(function(err, count){
+				likeCount = count;
+				Comments.find({'to':to, 'emotion':'공감하고 있습니다.'}).count(function(err, count){
+					sameCount = count;
+					Comments.find({'to':to, 'emotion':'궁금해 합니다.'}).count(function(err, count){
+						queCount = count;
+						Comments.find({'to':to}).count(function(err, count){
+							allCount = count;
+								res.render('presentation', {'port':port, 'username':req.session.username, 'p_id':req.params.id, 'title':req.params.title,'disCount':disCount, 'diffCount':diffCount, 'likeCount':likeCount, 'sameCount':sameCount, 'queCount':queCount, 'allCount':allCount});
+						});
+					});	
+				});
+			});
+		});
+	});
 });
 
 app.listen(port);
