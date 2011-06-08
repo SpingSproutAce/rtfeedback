@@ -47,7 +47,7 @@ html(lang='utf-8')
 					var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
 					
 					// add message
-					$("#rt_feedbacks").append("<li>" + message.from + emoticonImg + ' "' + message.body +  '"</li>');
+					$("#rt_feedbacks").append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' +  emoticon + '">"' + message.body +  '"</span></li>');
 				});
 				$('#send_comment').click(function(){
 					var msg_body = $('#comment').val();
@@ -79,17 +79,25 @@ html(lang='utf-8')
 							var emoticonImgURL = '/images/' + emoticon + '.gif';
 							var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
 							// add comment
-							list.append("<li>" + message.from + emoticonImg + ' "' + message.body +  '"</li>');
+							list.append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' + emoticon + '">"' + message.body +  '"</span></li>');
 						});
 					});
 				});
 				
+				$('#clear_comment').click(function(){
+					$("#rt_feedbacks").empty();
+				});
 				
+				$('#comment').keypress(function(event){
+					if(event.which == '13') {
+						$('#send_comment').click();
+					}
+				});
 				
 			});
 	body(id='chat_body')
 		div(id='title_bar')
-			p #{username}의 feedbacks #{title}
+			p #{username}, Let's react to #{title}
 		div(id='chat_box')
 			ul(id='rt_feedbacks')
 			div(id='statics_bar')
@@ -127,3 +135,4 @@ html(lang='utf-8')
 				option(value='궁금해 합니다.') 궁금합니다.
 			input(id='comment', name='comment', autocomplete='off', size='50')
 			button(id='send_comment') Send
+			button(id='clear_comment') Clear

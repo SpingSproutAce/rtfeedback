@@ -321,19 +321,19 @@ ol, ul {list-style: none; }
     font-weight: bold;
     margin-right: 4px;
 }
-.dis {
+#statics_bar .dis {
 	background-color: #E8272C;
 }
-.diff {
+#statics_bar .diff {
 	background-color: #FE7A15;
 }
-.like {
+#statics_bar .like {
 	background-color: #a4c639;
 }
-.same {
+#statics_bar .same {
 	background-color: #00AFEF;
 }
-.que {
+#statics_bar .que {
 	background-color: #4176ab;
 }
 .emoticon {
@@ -352,4 +352,22 @@ div.footer{
 }
 div.article ul.list{
   text-align: left;
+}
+.msg_body {
+	font-style: italic;
+}
+#rt_feedbacks .dis {
+	color: #E8272C;
+}
+#rt_feedbacks .diff {
+	color: #FE7A15;
+}
+#rt_feedbacks .like {
+	color: #a4c639;
+}
+#rt_feedbacks .same {
+	color: #00AFEF;
+}
+#rt_feedbacks .que {
+	color: #4176ab;
 }
