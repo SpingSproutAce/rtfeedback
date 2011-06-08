@@ -1,5 +1,10 @@
-h1='2011 자바 개발자 컨퍼런스 피드백'
-form(method='post', action='/login')
-	label 이름: 
-		input(name='username')
-	input(type='submit', value='Go!')
+div.container.center
+	div.header
+		h1='2011 자바 개발자 컨퍼런스 피드백'
+	div.article
+		form(method='post', action='/login')
+			h4='Nick Name: '
+			input(type='text', name='username')
+			input(type='submit', value='Go!')
+	div.footer
+		a(href='http://springsprout.org') made by 봄싹
