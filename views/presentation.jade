@@ -47,7 +47,7 @@ html(lang='utf-8')
 					var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
 					
 					// add message
-					$("#rt_feedbacks").append("<li>" + message.from + emoticonImg + ' "' + message.body +  '"</li>');
+					$("#rt_feedbacks").append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' +  emoticon + '">"' + message.body +  '"</span></li>');
 				});
 				$('#send_comment').click(function(){
 					var msg_body = $('#comment').val();
@@ -79,7 +79,7 @@ html(lang='utf-8')
 							var emoticonImgURL = '/images/' + emoticon + '.gif';
 							var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
 							// add comment
-							list.append("<li>" + message.from + emoticonImg + ' "' + message.body +  '"</li>');
+							list.append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' + emoticon + '">"' + message.body +  '"</span></li>');
 						});
 					});
 				});
@@ -97,7 +97,7 @@ html(lang='utf-8')
 			});
 	body(id='chat_body')
 		div(id='title_bar')
-			p #{username}의 feedbacks #{title}
+			p #{username} reacts to #{title}
 		div(id='chat_box')
 			ul(id='rt_feedbacks')
 			div(id='statics_bar')
