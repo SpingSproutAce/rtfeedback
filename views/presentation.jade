@@ -84,7 +84,9 @@ html(lang='utf-8')
 					});
 				});
 				
-				
+				$('#clear_comment').click(function(){
+					$("#rt_feedbacks").empty();
+				});
 				
 			});
 	body(id='chat_body')
@@ -127,3 +129,4 @@ html(lang='utf-8')
 				option(value='궁금해 합니다.') 궁금합니다.
 			input(id='comment', name='comment', autocomplete='off', size='50')
 			button(id='send_comment') Send
+			button(id='clear_comment') Clear
