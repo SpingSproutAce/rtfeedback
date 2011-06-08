@@ -134,7 +134,7 @@ app.get('/comments', function(req, res){
 	});
 });
 
-app.get('/p/:id/:title', function(req, res){
+app.get('/p/:id', function(req, res){
 	var to = req.params.id;
 	var disCount, diffCount, likeCount, sameCount, queCount, allCount;
 	Comments.find({'to':to, 'emotion':'불만이 있습니다.'}).count(function(err, count){
@@ -149,7 +149,7 @@ app.get('/p/:id/:title', function(req, res){
 						queCount = count;
 						Comments.find({'to':to}).count(function(err, count){
 							allCount = count;
-								res.render('presentation', {'port':port, 'username':req.session.username, 'p_id':req.params.id, 'title':req.params.title,'disCount':disCount, 'diffCount':diffCount, 'likeCount':likeCount, 'sameCount':sameCount, 'queCount':queCount, 'allCount':allCount});
+								res.render('presentation', {'port':port, 'username':req.session.username, 'p_id':req.params.id, 'title':req.query.title,'disCount':disCount, 'diffCount':diffCount, 'likeCount':likeCount, 'sameCount':sameCount, 'queCount':queCount, 'allCount':allCount});
 						});
 					});	
 				});

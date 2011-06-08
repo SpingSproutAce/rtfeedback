@@ -44,7 +44,6 @@ html(lang='utf-8')
 					
 					// add message
 					$("#rt_feedbacks").append("<li>[" + message.from + "]님은 " + message.emotion + ' "' + message.body +  '"</li>');
-					$("#comment").attr('value', '');
 				});
 				$('#send_comment').click(function(){
 					var msg_body = $('#comment').val();
@@ -53,6 +52,7 @@ html(lang='utf-8')
 						return;
 					}
 					socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{username}', 'emotion':msg_emotion}});
+					$("#comment").attr('value', '');
 				});
 				
 				$('.tag').click(function(){

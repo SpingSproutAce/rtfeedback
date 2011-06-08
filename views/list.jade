@@ -5,9 +5,7 @@ head
 			$('li a').click(function(){
 				var url = $(this).attr('href');
 				var title = $(this).text();
-				console.log(url);
-				console.log(title);
-				document.location.href = url+"/"+title;
+				document.location.href = url + "/?title=" + title;
 				return false;
 			});
 		});		
