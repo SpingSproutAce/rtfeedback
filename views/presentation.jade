@@ -22,14 +22,14 @@ html(lang='utf-8')
 				socket.on('message', function(obj){
 					var message = obj.msg;
 					var countTag;
-					
+					var emoticon;
 					// count up specific tag count
 					switch(message.emotion) {
-						case disText: countTag = $(".dis").next().next('.tag-count'); break;
-						case diffText: countTag = $(".diff").next().next('.tag-count'); break;
-						case likeText: countTag = $(".like").next().next('.tag-count'); break;
-						case sameText: countTag = $(".same").next().next('.tag-count'); break;
-						case queText: countTag = $(".que").next().next('.tag-count'); break;
+						case disText: countTag = $(".dis").next().next('.tag-count'); emoticon='dis'; break;
+						case diffText: countTag = $(".diff").next().next('.tag-count'); emoticon='diff'; break;
+						case likeText: countTag = $(".like").next().next('.tag-count'); emoticon='like'; break;
+						case sameText: countTag = $(".same").next().next('.tag-count'); emoticon='same'; break;
+						case queText: countTag = $(".que").next().next('.tag-count'); emoticon='que'; break;
 						default: break;
 					}
 					var count = countTag.text();
@@ -42,8 +42,12 @@ html(lang='utf-8')
 					count++;
 					totalTag.text(count);
 					
+					// set emoticonImg
+					var emoticonImgURL = '/images/' + emoticon + '.gif';
+					var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
+					
 					// add message
-					$("#rt_feedbacks").append("<li>[" + message.from + "]님은 " + message.emotion + ' "' + message.body +  '"</li>');
+					$("#rt_feedbacks").append("<li>" + message.from + emoticonImg + ' "' + message.body +  '"</li>');
 				});
 				$('#send_comment').click(function(){
 					var msg_body = $('#comment').val();
@@ -62,7 +66,20 @@ html(lang='utf-8')
 					$.getJSON('/comments/', {'to':'#{p_id}', 'emotion':emotion}, function(data){
 						list.empty();
 						$.each(data, function(index, message){
-							list.append("<li>[" + message.from + "]님은 " + message.emotion + ' "' + message.body +  '"</li>');
+							var emoticon;
+							switch(message.emotion) {
+								case disText: emoticon='dis'; break;
+								case diffText: emoticon='diff'; break;
+								case likeText: emoticon='like'; break;
+								case sameText: emoticon='same'; break;
+								case queText: emoticon='que'; break;
+								default: break;
+							}
+							// set emoticonImg
+							var emoticonImgURL = '/images/' + emoticon + '.gif';
+							var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
+							// add comment
+							list.append("<li>" + message.from + emoticonImg + ' "' + message.body +  '"</li>');
 						});
 					});
 				});
