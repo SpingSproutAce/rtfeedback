@@ -265,7 +265,7 @@ ol, ul {list-style: none; }
 }
 #chat_body {
 	width: 550px;
-	background-color: grey;
+	background-color: white;
 }
 #title_bar {
 	width: 550px;
@@ -328,7 +328,7 @@ ol, ul {list-style: none; }
 	background-color: #FE7A15;
 }
 #statics_bar .like {
-	background-color: #a4c639;
+	background-color: #46937D;
 }
 #statics_bar .same {
 	background-color: #00AFEF;
@@ -363,7 +363,7 @@ div.article ul.list{
 	color: #FE7A15;
 }
 #rt_feedbacks .like {
-	color: #a4c639;
+	color: #46937D;
 }
 #rt_feedbacks .same {
 	color: #00AFEF;

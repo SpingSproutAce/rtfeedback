@@ -6,7 +6,7 @@ div.container.center
 			- each p in result
 				- var link = '/p/' + p._id
 				li
-					a(href=link)  #{p.title}
+					a(href=link)  #{p.speaker}: #{p.title}
 	div.footer
 		a(href='http://springsprout.org') made by 봄싹
 script(src='/javascripts/jquery-1.6.1.min.js')

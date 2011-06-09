@@ -3,7 +3,7 @@ div.container.center.index
 		h1='2011 자바 개발자 컨퍼런스 피드백'
 	div.article
 		form(method='post', action='/login')
-			h4.subheader='Nick Name: '
+			h4.subheader='Nickname: '
 			input(type='text', name='username')
 			- if (typeof(error) != 'undefined')
 				span(class='error_msg') #{error}

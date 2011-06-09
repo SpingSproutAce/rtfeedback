@@ -99,7 +99,7 @@ socket.on('connection', function(client){
 			// publish
 			var clientList = channelMap.get(channel);
 			for(var i in clientList) {
-				clientList[i].send({'msg':msg});
+				clientList[i].send({'msg':newComments});
 			}
 		}		
 	});

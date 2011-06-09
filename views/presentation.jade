@@ -47,7 +47,17 @@ html(lang='utf-8')
 					var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
 					
 					// add message
-					$("#rt_feedbacks").append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' +  emoticon + '">"' + message.body +  '"</span></li>');
+					//$("#rt_feedbacks").append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' +  emoticon + '">"' + message.body +  '"</span></li>');
+					var commentBox = '<li><div>';
+						commentBox += '<div class="emotion">' + emoticonImg + '</div>';
+						commentBox += '<div class="comment-text">';
+							commentBox += '<div class="comment-body">' + message.body + '</div>';
+							commentBox += '<div class="comment-meta"> feedback by <cite>' + message.from + '</cite> on ' + message.date + '</div>';
+						commentBox += '</div>';
+					commentBox += '</div></li>';
+					$("#rt_feedbacks").append(commentBox);
+					
+					
 				});
 				$('#send_comment').click(function(){
 					var msg_body = $('#comment').val();
@@ -79,7 +89,15 @@ html(lang='utf-8')
 							var emoticonImgURL = '/images/' + emoticon + '.gif';
 							var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
 							// add comment
-							list.append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' + emoticon + '">"' + message.body +  '"</span></li>');
+							// list.append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' + emoticon + '">"' + message.body +  '"</span></li>');
+							var commentBox = '<li><div>';
+								commentBox += '<div class="emotion">' + emoticonImg + '</div>';
+								commentBox += '<div class="comment-text">';
+									commentBox += '<div class="comment-body">' + message.body + '</div>';
+									commentBox += '<div class="comment-meta"> feedback by <cite>' + message.from + '</cite> on ' + message.date + '</div>';
+								commentBox += '</div>';
+							commentBox += '</div></li>';
+							list.append(commentBox);
 						});
 					});
 				});
