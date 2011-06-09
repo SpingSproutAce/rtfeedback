@@ -5,7 +5,8 @@
 var express = require('express'),
 	io = require('socket.io'),
 	models = require('./lib/models'),
-	Comments = models.Comments;
+	Comments = models.Comments,
+	Presentations = models.Presentations;
 
 var app = module.exports = express.createServer();
 
@@ -98,7 +99,7 @@ socket.on('connection', function(client){
 			// publish
 			var clientList = channelMap.get(channel);
 			for(var i in clientList) {
-				clientList[i].send({'msg':msg});
+				clientList[i].send({'msg':newComments});
 			}
 		}		
 	});
@@ -124,7 +125,9 @@ app.post('/login', function(req, res){
 
 app.get('/list', function(req, res){
 	// get the presentation list
-	res.render('list', {'username':req.session.username});
+	Presentations.find(function(err, result){
+		res.render('list', {'username':req.session.username, 'result':result});
+	});
 });
 
 app.get('/comments', function(req, res){
@@ -149,12 +152,72 @@ app.get('/p/:id', function(req, res){
 						queCount = count;
 						Comments.find({'to':to}).count(function(err, count){
 							allCount = count;
-								res.render('presentation', {'port':port, 'username':req.session.username, 'p_id':req.params.id, 'title':req.query.title,'disCount':disCount, 'diffCount':diffCount, 'likeCount':likeCount, 'sameCount':sameCount, 'queCount':queCount, 'allCount':allCount});
+							Presentations.findById(req.params.id, function(err, p){
+								if(!p){
+									res.redirect('/list');
+								} else {
+									res.render('presentation', {'port':port, 'username':req.session.username, 'p_id':req.params.id, 'title':p.title, 'disCount':disCount, 'diffCount':diffCount, 'likeCount':likeCount, 'sameCount':sameCount, 'queCount':queCount, 'allCount':allCount});
+								}
+							});
 						});
 					});	
 				});
 			});
 		});
+	});
+});
+
+app.get('/list/mgt', function(req, res){
+	Presentations.find(function(err, result){
+		console.log(result);
+		res.render("list-mgt", {'result':result});
+	});
+});
+
+app.post('/list/add', function(req, res){
+	console.log(req.body);
+	var presentation = new Presentations();
+	presentation.title = req.body.title;
+	presentation.speaker = req.body.speaker;
+	presentation.body = req.body.body;
+	presentation.save(function(err){
+		// console.log(err);
+	});
+	res.redirect("/list/mgt");
+});
+
+app.get('/p/mgt/:id', function(req, res){
+	Presentations.findById(req.params.id, function(err, result){
+		res.render("p-mgt", {'p':result});
+	});
+});
+
+app.post('/p/mgt/:id', function(req, res){
+	Presentations.findById(req.params.id, function(err, p){
+		if(!p) {
+			res.render("p-mgt", {'p':result});
+		} else {
+			p.title = req.body.title;
+			p.speaker = req.body.speaker;
+			p.body = req.body.body;
+			p.save(function(err) {
+				if (err)
+					console.log('error')
+					res.redirect("/p/mgt/" + req.params.id);
+	    	});
+		}
+	});
+});
+
+app.get('/p/del/:id', function(req, res){
+	Comments.find({'to':req.params.id}).count(function(err, count){
+		if(count === 0) {
+			Presentations.remove({'_id':req.params.id}, function(err){
+				if(err)
+					console.log(err);
+			});
+		}
+		res.redirect("/list/mgt/");
 	});
 });
 

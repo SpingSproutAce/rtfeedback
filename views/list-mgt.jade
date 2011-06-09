@@ -1,12 +1,21 @@
 div.container.center
 	div.header
 		h1='The 11th JCO Schedule'
+	div.form
+		form(method='post', action='/list/add')
+			label title
+				input(type='text',name='title')
+			label speaker
+				input(type='text',name='speaker')
+			label body
+				input(type='text',name='body')
+			input(type='submit', value='Add!')
 	div.article
 		ul.list
 			- each p in result
-				- var link = '/p/' + p._id
+				- var link = '/p/mgt/' + p._id
 				li
-					a(href=link)  #{p.speaker}: #{p.title}
+					a(href=link)  #{p.title}
 	div.footer
 		a(href='http://springsprout.org') made by 봄싹
 script(src='/javascripts/jquery-1.6.1.min.js')
@@ -14,8 +23,7 @@ script(type='text/javascript')
 	$(function(){
 		$('li a').click(function(){
 			var url = $(this).attr('href');
-			var title = $(this).text();
 			document.location.href = url;
 			return false;
 		});
-	});		
+	});
