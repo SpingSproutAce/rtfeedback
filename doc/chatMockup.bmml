@@ -1,124 +1,187 @@
-<mockup version="1.0" skin="sketch" measuredW="1306" measuredH="565" mockupW="556" mockupH="476">
+<mockup version="1.0" skin="sketch" measuredW="1190" measuredH="653" mockupW="1053" mockupH="653">
   <controls>
-    <control controlID="0" controlTypeID="com.balsamiq.mockups::VerticalTabBar" x="762" y="133" w="508" h="388" measuredW="200" measuredH="209" zOrder="1" locked="false" isInGroup="-1">
+    <control controlID="45" controlTypeID="com.balsamiq.mockups::BrowserWindow" x="137" y="0" w="1024" h="643" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
       <controlProperties>
+        <text>A%20Web%20Page%0Ahttp%3A//</text>
+      </controlProperties>
+    </control>
+    <control controlID="74" controlTypeID="com.balsamiq.mockups::HSplitter" x="480" y="74" w="-1" h="541" measuredW="12" measuredH="100" zOrder="23" locked="false" isInGroup="-1"/>
+    <control controlID="75" controlTypeID="com.balsamiq.mockups::List" x="152" y="119" w="322" h="338" measuredW="100" measuredH="126" zOrder="24" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>WHy%20node.js%3F%20ABCDEF%20GHI%20JKLMNOP%0ASKELEtONIZE%20with%20YOON%20YOON%20YOON%0AI%20Have%20a%20haed-ache.%20FUCK%21%20FUCK%21%20FUCk%21%20My%20Haed%21%0AI%20Don%27t%20want%20to%20belong%20to%20here.%0AI%20hope%20my%20familly%20and%20springsprout%20be%20happy%20and%20GET%20RICH%21%0A...</text>
+      </controlProperties>
+    </control>
+    <control controlID="76" controlTypeID="com.balsamiq.mockups::SubTitle" x="152" y="82" w="-1" h="-1" measuredW="153" measuredH="37" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Presentations</text>
+      </controlProperties>
+    </control>
+    <control controlID="77" controlTypeID="com.balsamiq.mockups::SubTitle" x="498" y="83" w="-1" h="-1" measuredW="144" measuredH="37" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Reactions%20To</text>
+      </controlProperties>
+    </control>
+    <control controlID="79" controlTypeID="com.balsamiq.mockups::Label" x="668" y="115" w="175" h="26" measuredW="146" measuredH="23" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>present%20by%20WHITESHIP</text>
+      </controlProperties>
+    </control>
+    <control controlID="81" controlTypeID="com.balsamiq.mockups::Label" x="668" y="82" w="479" h="33" measuredW="313" measuredH="29" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>18</size>
+        <text>WHy%20node.js%3F%20ABCDEF%20GHI%20JKLMNOP</text>
+      </controlProperties>
+    </control>
+    <control controlID="82" controlTypeID="com.balsamiq.mockups::VerticalTabBar" x="539" y="141" w="608" h="316" measuredW="200" measuredH="209" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <backgroundAlpha>1</backgroundAlpha>
+        <position>left</position>
         <selectedIndex>0</selectedIndex>
         <text>ALL%0ALIKE%0ASO%20SO%0ANOT%20GOOD%0AWHAT%20THE%20HELL</text>
+        <value>0</value>
+        <verticalScrollbar>true</verticalScrollbar>
       </controlProperties>
     </control>
-    <control controlID="1" controlTypeID="com.balsamiq.mockups::ComboBox" x="869" y="521" w="-1" h="-1" measuredW="60" measuredH="23" zOrder="3" locked="false" isInGroup="-1">
-      <controlProperties>
-        <state>closed</state>
-        <text>LIKE%0ASO%20SO%0ANOT%20GOOD%0AWHAT%20THE%20HELL</text>
-      </controlProperties>
-    </control>
-    <control controlID="2" controlTypeID="com.balsamiq.mockups::TextInput" x="929" y="521" w="341" h="-1" measuredW="88" measuredH="27" zOrder="4" locked="false" isInGroup="-1">
-      <controlProperties>
-        <text>Some%20text..%20</text>
-      </controlProperties>
-    </control>
-    <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="887" y="152" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="5" locked="false" isInGroup="-1">
-      <controlProperties>
-        <icon>YIMIcon%7Csmall</icon>
-      </controlProperties>
-    </control>
-    <control controlID="4" controlTypeID="com.balsamiq.mockups::Canvas" x="879" y="144" w="362" h="57" measuredW="100" measuredH="70" zOrder="2" locked="false" isInGroup="-1">
+    <control controlID="83" controlTypeID="com.balsamiq.mockups::Canvas" x="679" y="153" w="433" h="63" measuredW="100" measuredH="70" zOrder="3" locked="false" isInGroup="-1">
       <controlProperties>
         <borderStyle>roundedSolid</borderStyle>
       </controlProperties>
     </control>
-    <control controlID="5" controlTypeID="com.balsamiq.mockups::Paragraph" x="926" y="152" w="276" h="24" measuredW="200" measuredH="140" zOrder="6" locked="false" isInGroup="-1">
+    <control controlID="84" controlTypeID="com.balsamiq.mockups::ComboBox" x="694" y="461" w="72" h="-1" measuredW="61" measuredH="24" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>14</size>
+        <state>closed</state>
+        <text>LIKE%0ASO%20SO%0ANOT%20GOOD%0AWHAT%20THE%20HELL</text>
+      </controlProperties>
+    </control>
+    <control controlID="85" controlTypeID="com.balsamiq.mockups::TextInput" x="772" y="459" w="375" h="-1" measuredW="91" measuredH="28" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>14</size>
+        <text>Some%20text..%20</text>
+      </controlProperties>
+    </control>
+    <control controlID="86" controlTypeID="com.balsamiq.mockups::Icon" x="689" y="162" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>YIMIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="87" controlTypeID="com.balsamiq.mockups::Paragraph" x="735" y="162" w="330" h="27" measuredW="200" measuredH="140" zOrder="7" locked="false" isInGroup="-1">
       <controlProperties>
         <text>Good%20Job%21%21</text>
       </controlProperties>
     </control>
-    <control controlID="6" controlTypeID="com.balsamiq.mockups::Paragraph" x="926" y="180" w="276" h="15" measuredW="200" measuredH="140" zOrder="7" locked="false" isInGroup="-1">
+    <control controlID="88" controlTypeID="com.balsamiq.mockups::Paragraph" x="735" y="193" w="330" h="17" measuredW="200" measuredH="140" zOrder="8" locked="false" isInGroup="-1">
       <controlProperties>
         <size>10</size>
         <state>disabled</state>
         <text>1%20minute%20by%20yoon</text>
       </controlProperties>
     </control>
-    <control controlID="7" controlTypeID="com.balsamiq.mockups::Canvas" x="879" y="210" w="362" h="57" measuredW="100" measuredH="70" zOrder="8" locked="false" isInGroup="-1">
+    <control controlID="89" controlTypeID="com.balsamiq.mockups::Canvas" x="679" y="227" w="433" h="63" measuredW="100" measuredH="70" zOrder="9" locked="false" isInGroup="-1">
       <controlProperties>
         <borderStyle>roundedSolid</borderStyle>
       </controlProperties>
     </control>
-    <control controlID="8" controlTypeID="com.balsamiq.mockups::Icon" x="887" y="218" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="9" locked="false" isInGroup="-1">
+    <control controlID="90" controlTypeID="com.balsamiq.mockups::Icon" x="689" y="236" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="10" locked="false" isInGroup="-1">
       <controlProperties>
         <icon>ThumbsUpIcon%7Csmall</icon>
       </controlProperties>
     </control>
-    <control controlID="9" controlTypeID="com.balsamiq.mockups::Paragraph" x="926" y="218" w="276" h="24" measuredW="200" measuredH="140" zOrder="10" locked="false" isInGroup="-1">
+    <control controlID="91" controlTypeID="com.balsamiq.mockups::Paragraph" x="735" y="236" w="330" h="27" measuredW="200" measuredH="140" zOrder="11" locked="false" isInGroup="-1">
       <controlProperties>
         <text>Lovely%21%20Lovely%21%20Lovely%21</text>
       </controlProperties>
     </control>
-    <control controlID="10" controlTypeID="com.balsamiq.mockups::Paragraph" x="926" y="246" w="276" h="15" measuredW="200" measuredH="140" zOrder="11" locked="false" isInGroup="-1">
+    <control controlID="92" controlTypeID="com.balsamiq.mockups::Paragraph" x="735" y="266" w="330" h="17" measuredW="200" measuredH="140" zOrder="12" locked="false" isInGroup="-1">
       <controlProperties>
         <size>10</size>
         <state>disabled</state>
         <text>36%20seconds%20ago%20by%20Outsider</text>
       </controlProperties>
     </control>
-    <control controlID="11" controlTypeID="com.balsamiq.mockups::Canvas" x="879" y="276" w="362" h="57" measuredW="100" measuredH="70" zOrder="12" locked="false" isInGroup="-1">
+    <control controlID="93" controlTypeID="com.balsamiq.mockups::Canvas" x="679" y="300" w="433" h="63" measuredW="100" measuredH="70" zOrder="13" locked="false" isInGroup="-1">
       <controlProperties>
         <borderStyle>roundedSolid</borderStyle>
       </controlProperties>
     </control>
-    <control controlID="12" controlTypeID="com.balsamiq.mockups::Icon" x="887" y="284" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="13" locked="false" isInGroup="-1">
+    <control controlID="94" controlTypeID="com.balsamiq.mockups::Icon" x="689" y="309" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="14" locked="false" isInGroup="-1">
       <controlProperties>
         <icon>ThumbsDownIcon%7Csmall</icon>
       </controlProperties>
     </control>
-    <control controlID="13" controlTypeID="com.balsamiq.mockups::Paragraph" x="926" y="284" w="276" h="24" measuredW="200" measuredH="140" zOrder="14" locked="false" isInGroup="-1">
+    <control controlID="95" controlTypeID="com.balsamiq.mockups::Paragraph" x="735" y="309" w="330" h="27" measuredW="200" measuredH="140" zOrder="15" locked="false" isInGroup="-1">
       <controlProperties>
         <text>Really%20I%20don%27t%20like%20Your%20session.</text>
       </controlProperties>
     </control>
-    <control controlID="14" controlTypeID="com.balsamiq.mockups::Paragraph" x="926" y="312" w="276" h="15" measuredW="200" measuredH="140" zOrder="15" locked="false" isInGroup="-1">
+    <control controlID="96" controlTypeID="com.balsamiq.mockups::Paragraph" x="735" y="340" w="330" h="17" measuredW="200" measuredH="140" zOrder="16" locked="false" isInGroup="-1">
       <controlProperties>
         <size>10</size>
         <state>disabled</state>
         <text>12%20seconds%20ago%20ago%20by%20helols</text>
       </controlProperties>
     </control>
-    <control controlID="15" controlTypeID="com.balsamiq.mockups::Canvas" x="879" y="342" w="362" h="57" measuredW="100" measuredH="70" zOrder="16" locked="false" isInGroup="-1">
+    <control controlID="97" controlTypeID="com.balsamiq.mockups::Canvas" x="679" y="374" w="433" h="63" measuredW="100" measuredH="70" zOrder="17" locked="false" isInGroup="-1">
       <controlProperties>
         <borderStyle>roundedSolid</borderStyle>
       </controlProperties>
     </control>
-    <control controlID="16" controlTypeID="com.balsamiq.mockups::Icon" x="887" y="350" w="-1" h="-1" measuredW="32" measuredH="32" zOrder="17" locked="false" isInGroup="-1">
+    <control controlID="98" controlTypeID="com.balsamiq.mockups::Icon" x="689" y="383" w="-1" h="-1" measuredW="32" measuredH="32" zOrder="18" locked="false" isInGroup="-1">
       <controlProperties>
         <icon>Alert2Icon%7Cmedium</icon>
       </controlProperties>
     </control>
-    <control controlID="17" controlTypeID="com.balsamiq.mockups::Paragraph" x="926" y="350" w="276" h="24" measuredW="200" measuredH="140" zOrder="18" locked="false" isInGroup="-1">
+    <control controlID="99" controlTypeID="com.balsamiq.mockups::Paragraph" x="735" y="383" w="330" h="27" measuredW="200" measuredH="140" zOrder="19" locked="false" isInGroup="-1">
       <controlProperties>
         <text>What%20the%20hell%21%21%21%21</text>
       </controlProperties>
     </control>
-    <control controlID="18" controlTypeID="com.balsamiq.mockups::Paragraph" x="926" y="378" w="276" h="15" measuredW="200" measuredH="140" zOrder="19" locked="false" isInGroup="-1">
+    <control controlID="100" controlTypeID="com.balsamiq.mockups::Paragraph" x="735" y="413" w="330" h="17" measuredW="200" measuredH="140" zOrder="20" locked="false" isInGroup="-1">
       <controlProperties>
         <size>10</size>
         <state>disabled</state>
         <text>now%20by%20whiteship</text>
       </controlProperties>
     </control>
-    <control controlID="26" controlTypeID="com.balsamiq.mockups::TitleWindow" x="750" y="89" w="556" h="476" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+    <control controlID="101" controlTypeID="com.balsamiq.mockups::Label" x="650" y="461" w="53" h="26" measuredW="44" measuredH="23" zOrder="21" locked="false" isInGroup="-1">
       <controlProperties>
-        <bottomheight>2</bottomheight>
-        <dragger>false</dragger>
-        <maximizeRestore>false</maximizeRestore>
-        <text>%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20What%20is%20Node.js%20with%20you</text>
-        <topheight>37</topheight>
-        <verticalScrollbar>false</verticalScrollbar>
+        <text>IsYoon</text>
       </controlProperties>
     </control>
-    <control controlID="27" controlTypeID="com.balsamiq.mockups::PointyButton" x="762" y="93" w="54" h="-1" measuredW="48" measuredH="27" zOrder="20" locked="false" isInGroup="-1">
+    <control controlID="103" controlTypeID="com.balsamiq.mockups::Arrow" x="491" y="381" w="128" h="141" measuredW="150" measuredH="100" zOrder="27" locked="false" isInGroup="-1">
       <controlProperties>
-        <direction>left</direction>
-        <text>Back</text>
+        <rightArrow>false</rightArrow>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="104" controlTypeID="com.balsamiq.mockups::Label" x="596" y="528" w="-1" h="-1" measuredW="110" measuredH="23" zOrder="28" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Left%20Foldable%20Bar</text>
+      </controlProperties>
+    </control>
+    <control controlID="107" controlTypeID="com.balsamiq.mockups::RoundButton" x="619" y="193" w="23" h="23" measuredW="32" measuredH="32" zOrder="29" locked="false" isInGroup="-1">
+      <controlProperties>
+        <shape>circle</shape>
+        <size>13</size>
+        <text>2</text>
+      </controlProperties>
+    </control>
+    <control controlID="108" controlTypeID="com.balsamiq.mockups::RoundButton" x="619" y="260" w="23" h="23" measuredW="32" measuredH="32" zOrder="30" locked="false" isInGroup="-1">
+      <controlProperties>
+        <shape>circle</shape>
+        <size>13</size>
+        <text>5</text>
+      </controlProperties>
+    </control>
+    <control controlID="109" controlTypeID="com.balsamiq.mockups::Arrow" x="644" y="283" w="192" h="217" measuredW="150" measuredH="100" zOrder="31" locked="false" isInGroup="-1">
+      <controlProperties>
+        <rightArrow>false</rightArrow>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="110" controlTypeID="com.balsamiq.mockups::Label" x="815" y="500" w="375" h="153" measuredW="915" measuredH="23" zOrder="32" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%uC9C0%uAE08%uC740%20ALL%uC5D0%20%uC788%uC73C%uB2C8%uAE4C%20%uC774%uB7F0%uAC8C%20%uBCF4%uC77C%20%uD544%uC694%uAC00%20%uC5C6%uC744%20%uAC83%20%uAC19%uC740%uB370..%20%uB9CC%uC57D%uC5D0%2C%20Like%uC5D0%20%uC788%uB2E4%uBA74..%20Not%20Good%uC5D0%20%uC0C8%uB85C%20%uCD94%uAC00%uB41C%20%uD53C%uB4DC%uBC31%uC774%20%uBA87%uAC20%uC9C0%20%uD45C%uC2DC%uD574%uC8FC%uB294%uAC78%20%uC0DD%uAC01%uD574%uBD24%uC5B4..</text>
       </controlProperties>
     </control>
   </controls>
