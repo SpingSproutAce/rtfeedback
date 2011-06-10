@@ -138,6 +138,9 @@ app.get('/comments', function(req, res){
 });
 
 app.get('/p/:id', function(req, res){
+	if(!req.session.username) {
+		res.redirect('/');		
+	} else {
 	var to = req.params.id;
 	var disCount, diffCount, likeCount, sameCount, queCount, allCount;
 	Comments.find({'to':to, 'emotion':'불만이 있습니다.'}).count(function(err, count){
@@ -165,6 +168,7 @@ app.get('/p/:id', function(req, res){
 			});
 		});
 	});
+	}
 });
 
 app.get('/list/mgt', function(req, res){
