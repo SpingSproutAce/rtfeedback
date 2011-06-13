@@ -56,10 +56,11 @@ html(lang='utf-8')
 						commentBox += '</div>';
 					commentBox += '</div></li>';
 					$("#rt_feedbacks").append(commentBox);
-					
-					
 				});
 				$('#send_comment').click(function(){
+					if(!'#{username}') {
+						document.location.href = "/";
+					}
 					var msg_body = $('#comment').val();
 					var msg_emotion = $('#emotion :selected').val();
 					if(!msg_body) {

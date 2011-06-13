@@ -154,13 +154,13 @@ app.get('/p/:id', function(req, res){
 		             },
 			presentFn = function(){
 				Presentations.findById(req.params.id, function(err, p){
-								if(!p){
-									res.redirect('/list');
-								} else {
-									params.title = p.title;
-									res.render('presentation',params);
-								}
-							});
+					if(!p){
+						res.redirect('/list');
+					} else {
+						params.title = p.title;
+						res.render('presentation',params);
+					}
+				});
 			},
 			countFn = function(args){
 				arg = args[idx++];
@@ -181,7 +181,6 @@ app.get('/p/:id', function(req, res){
 						  {'countNm' : 'allCount', 'callBack' :presentFn}
 						 ],
 			idx = 0;
-			
 			countFn(functions);
 	}
 });
@@ -239,6 +238,17 @@ app.get('/p/del/:id', function(req, res){
 		res.redirect("/list/mgt/");
 	});
 });
+
+app.get('/p/delrm/:id', function(req, res){
+	Presentations.remove({'_id':req.params.id}, function(err){
+		if(err) {
+			console.log(err);
+		}
+	});
+	res.redirect("/list/mgt/");
+});
+
+
 
 app.listen(port);
 console.log("Express server listening on port %d", app.address().port);
