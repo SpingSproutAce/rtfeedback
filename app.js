@@ -163,8 +163,8 @@ app.get('/p/:id', function(req, res){
 							});
 			},
 			countFn = function(args){
-				arg = args[idx++];
-				var param = {'to':params.p_id};
+				var arg = args[idx++],
+					param = {'to':params.p_id};
 				if(arg.emotion){
 					param.emotion = arg.emotion;
 				}
