@@ -141,33 +141,48 @@ app.get('/p/:id', function(req, res){
 	if(!req.session.username) {
 		res.redirect('/');		
 	} else {
-	var to = req.params.id;
-	var disCount, diffCount, likeCount, sameCount, queCount, allCount;
-	Comments.find({'to':to, 'emotion':'불만이 있습니다.'}).count(function(err, count){
-		disCount = count;
-		Comments.find({'to':to, 'emotion':'다르게 생각합니다.'}).count(function(err, count){
-			diffCount = count;
-			Comments.find({'to':to, 'emotion':'좋아합니다.'}).count(function(err, count){
-				likeCount = count;
-				Comments.find({'to':to, 'emotion':'공감하고 있습니다.'}).count(function(err, count){
-					sameCount = count;
-					Comments.find({'to':to, 'emotion':'궁금해 합니다.'}).count(function(err, count){
-						queCount = count;
-						Comments.find({'to':to}).count(function(err, count){
-							allCount = count;
-							Presentations.findById(req.params.id, function(err, p){
+		var params = {'port':port, 
+		              'username':req.session.username, 
+		              'p_id':req.params.id, 
+		              'title':'',
+		              'diffCount ' : 0,
+		              'disCount'   : 0,
+		              'sameCount'  : 0, 
+		              'likeCount'  : 0, 
+		              'queCount'   : 0, 
+		              'allCount'   : 0
+		             },
+			presentFn = function(){
+				Presentations.findById(req.params.id, function(err, p){
 								if(!p){
 									res.redirect('/list');
 								} else {
-									res.render('presentation', {'port':port, 'username':req.session.username, 'p_id':req.params.id, 'title':p.title, 'disCount':disCount, 'diffCount':diffCount, 'likeCount':likeCount, 'sameCount':sameCount, 'queCount':queCount, 'allCount':allCount});
+									params.title = p.title;
+									res.render('presentation',params);
 								}
 							});
-						});
-					});	
+			},
+			countFn = function(args){
+				arg = args[idx++];
+				var param = {'to':params.p_id};
+				if(arg.emotion){
+					param.emotion = arg.emotion;
+				}
+				Comments.find(param).count(function(err, count){
+					params[arg.countNm] = count;
+					arg.callBack.call(this,args);
 				});
-			});
-		});
-	});
+			},
+			functions  = [{'emotion' : '불만이 있습니다.', 'countNm' : 'disCount', 'callBack' :countFn},
+						  {'emotion' : '다르게 생각합니다.', 'countNm' : 'diffCount', 'callBack' :countFn},
+						  {'emotion' : '좋아합니다.', 'countNm' : 'likeCount', 'callBack' :countFn},
+						  {'emotion' : '공감하고 있습니다.', 'countNm' : 'sameCount', 'callBack' :countFn},
+						  {'emotion' : '궁금해 합니다.', 'countNm' : 'queCount', 'callBack' :countFn},
+						  {'countNm' : 'allCount', 'callBack' :presentFn}
+						 ],
+			idx = 0;
+			
+			countFn(functions);
 	}
 });
 
