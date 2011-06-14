@@ -132,7 +132,7 @@ app.get('/list', function(req, res){
 
 app.get('/comments', function(req, res){
 	res.contentType('application/json');
-	var commentList = Comments.find(req.query, function(err, docs){
+	var commentList = Comments.find(req.query).sort('date',-1).execFind(function(err, docs){
 		res.send(docs);
 	});
 });
@@ -145,9 +145,7 @@ app.get('/p/:id', function(req, res){
 		              'username':req.session.username, 
 		              'p_id':req.params.id, 
 		              'title':'',
-		              'diffCount ' : 0,
 		              'disCount'   : 0,
-		              'sameCount'  : 0, 
 		              'likeCount'  : 0, 
 		              'queCount'   : 0, 
 		              'allCount'   : 0
@@ -173,11 +171,9 @@ app.get('/p/:id', function(req, res){
 					arg.callBack.call(this,args);
 				});
 			},
-			functions  = [{'emotion' : '불만이 있습니다.', 'countNm' : 'disCount', 'callBack' :countFn},
-						  {'emotion' : '다르게 생각합니다.', 'countNm' : 'diffCount', 'callBack' :countFn},
-						  {'emotion' : '좋아합니다.', 'countNm' : 'likeCount', 'callBack' :countFn},
-						  {'emotion' : '공감하고 있습니다.', 'countNm' : 'sameCount', 'callBack' :countFn},
-						  {'emotion' : '궁금해 합니다.', 'countNm' : 'queCount', 'callBack' :countFn},
+			functions  = [{'emotion' : '!Good', 'countNm' : 'disCount', 'callBack' :countFn},
+						  {'emotion' : 'Good', 'countNm' : 'likeCount', 'callBack' :countFn},
+						  {'emotion' : 'Question', 'countNm' : 'queCount', 'callBack' :countFn},
 						  {'countNm' : 'allCount', 'callBack' :presentFn}
 						 ],
 			idx = 0;
