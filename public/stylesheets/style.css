@@ -138,7 +138,7 @@ ol, ul {list-style: none; }
 ================================================== */
 	ul.tabs { 
 		display: block;
-		margin: 0 0 20px 0;
+		margin: 0 0 15px 0;
 		padding: 0;
 		border-bottom: solid 1px #ddd; }
 	ul.tabs li { 
@@ -153,7 +153,7 @@ ol, ul {list-style: none; }
 		text-decoration: none;
 		width: auto; 
 		height: 29px; 
-		padding: 0px 20px; 
+		padding: 0px 10px; 
 		line-height: 30px; 
 		border: solid 1px #ddd;
 		border-width: 1px 0 0 1px; 
@@ -249,7 +249,9 @@ ol, ul {list-style: none; }
 		font-weight: bold;
 		font-size: 13px;  }
 	select { 
-		width: 220px; }
+		width: 80px;
+		margin:0;
+		margin-right:10px; }
 	input[type="checkbox"] {
 		display: inline; }
 	label span,
@@ -259,116 +261,59 @@ ol, ul {list-style: none; }
 		color: #444; 
 }
 /** custom****/		
-.ui-button {
-	font-size: 0.8em;
-	font-weight: normal;
-}
-#chat_body {
-	width: 550px;
-	background-color: white;
-}
-#title_bar {
-	width: 550px;
-	padding: 5px;
-	background-color: lightgrey;
-}
-#chat_box {
-	width: 560px;
-}
 #rt_feedbacks {
-	width: 385px;
-	height: 250px;
+	width: 100%;
+	height: 100%;
 	padding: 5px;
-	background-color: white;
-	float: left;
 	margin-top: 10px;
 	margin-bottom: 10px;
 	margin-right: 5px;
-	overflow: scroll;
 }
-#statics_bar {
-	width: 150px;
-	height: 250px;
-	padding: 5px;
-	padding-right: 0;
-	background-color: lightyellow;
-	float: right;
-	margin-top: 10px;
-	margin-bottom: 10px;
+#rt_feedbacks li{
+  clear: both;
+  padding-bottom:10px;
+  border-bottom: 1px solid #EBEBEB;
 }
-#input_bar {
-	clear: both;
+#rt_feedbacks li.loading{
+  text-align:center;
 }
-.tag {
-    background-color: #333333;
-    border: 1px solid #333333;
-    border-radius: 5px 5px 5px 5px;
-    color: #FFFFFF !important;
-    display: inline-block;
-    line-height: 1.9;
-    margin: 0 3px 3px 0;
-    padding: 0 10px 0 10px;
-    text-decoration: none;
+#rt_feedbacks li.loading > strong{
+    color:#666;
 }
-.tag:hover {
-	cursor: pointer;
-	background-color: #C0D0DC;
-    border: 1px solid #C0D0DC;
-	
+#rt_feedbacks li p{
+  line-height:1.25;
+  margin-bottom:5px;
+  color:#555;
 }
-.tag-count {
-	color: #444444;
-    font-size: 120%;
-    font-weight: bold;
-    margin-right: 4px;
+#rt_feedbacks li div.emotion{
+  width:50px;
+  height:50px;
+  float:left;
+  margin-right:10px;
 }
-#statics_bar .dis {
-	background-color: #E8272C;
+#rt_feedbacks li div.comment-body{
+  margin-left: 60px;
+  min-height:50px;
 }
-#statics_bar .diff {
-	background-color: #FE7A15;
+#rt_feedbacks li div.comment-body small{
+  color:#888;
 }
-#statics_bar .like {
-	background-color: #46937D;
+div#titleBar a.button{
+  margin-right:15px;
 }
-#statics_bar .same {
-	background-color: #00AFEF;
+div#titleBar h4{
+  display:inline;
 }
-#statics_bar .que {
-	background-color: #4176ab;
+input#comment{
+  width:200px;
 }
-.emoticon {
-	width: 20px;
-	height: 20px;
-}
-div.header{
-  margin-bottom:20px;
-}
-div.article{
-  padding:20px 0 10px 0;
+div#input_bar input#comment{
+  margin-left: 0;
+  width:350px;
 }
 div.footer{
-  color:#555;
-  font-size:12px;
+  text-align:center;
 }
-div.article ul.list{
-  text-align: left;
-}
-.msg_body {
-	font-style: italic;
-}
-#rt_feedbacks .dis {
-	color: #E8272C;
-}
-#rt_feedbacks .diff {
-	color: #FE7A15;
-}
-#rt_feedbacks .like {
-	color: #46937D;
-}
-#rt_feedbacks .same {
-	color: #00AFEF;
-}
-#rt_feedbacks .que {
-	color: #4176ab;
+ul.tabs li strong{
+  font-size:16px;
 }

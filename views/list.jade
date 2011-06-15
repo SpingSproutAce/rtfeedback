@@ -1,21 +1,22 @@
 div.container.center
-	div.header
-		h1='The 11th JCO Schedule'
-	div.article
-		ul.list
-			- each p in result
-				- var link = '/p/' + p._id
-				li
-					a(href=link)  #{p.speaker}: #{p.title}
-	div.footer
-		a(href='http://springsprout.org') made by 봄싹
+  div.header
+    h1='The 11th JCO Schedule'
+  div.article
+    ul.list
+      - each p in result
+        - var link = '/p/' + p._id
+        li
+          a(href=link)  #{p.speaker}: #{p.title}
+  div.footer
+    small made by 
+      a(href='http://springsprout.org' , target="_blank") springsprout
 script(src='/javascripts/jquery-1.6.1.min.js')
 script(type='text/javascript')
-	$(function(){
-		$('li a').click(function(){
-			var url = $(this).attr('href');
-			var title = $(this).text();
-			document.location.href = url;
-			return false;
-		});
-	});		
+  $(function(){
+    $('li a').click(function(){
+      var url = $(this).attr('href');
+      var title = $(this).text();
+      document.location.href = url;
+      return false;
+    });
+  });    

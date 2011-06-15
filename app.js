@@ -91,7 +91,7 @@ socket.on('connection', function(client){
 			newComments.from = msg.from;
 			newComments.body = msg.body;
 			newComments.emotion = msg.emotion;
-			newComments.date = new Date();
+			newComments.date = (+new Date());
 			newComments.save(function(err){
 				//console.log(err);
 			});
@@ -132,7 +132,8 @@ app.get('/list', function(req, res){
 
 app.get('/comments', function(req, res){
 	res.contentType('application/json');
-	var commentList = Comments.find(req.query).sort('date',-1).execFind(function(err, docs){
+	var commentList = Comments.find(req.query,function(err, docs){
+
 		res.send(docs);
 	});
 });
@@ -147,7 +148,7 @@ app.get('/p/:id', function(req, res){
 		              'title':'',
 		              'disCount'   : 0,
 		              'likeCount'  : 0, 
-		              'queCount'   : 0, 
+		              'askCount'   : 0, 
 		              'allCount'   : 0
 		             },
 			presentFn = function(){
@@ -173,7 +174,7 @@ app.get('/p/:id', function(req, res){
 			},
 			functions  = [{'emotion' : '!Good', 'countNm' : 'disCount', 'callBack' :countFn},
 						  {'emotion' : 'Good', 'countNm' : 'likeCount', 'callBack' :countFn},
-						  {'emotion' : 'Question', 'countNm' : 'queCount', 'callBack' :countFn},
+						  {'emotion' : 'Ask', 'countNm' : 'askCount', 'callBack' :countFn},
 						  {'countNm' : 'allCount', 'callBack' :presentFn}
 						 ],
 			idx = 0;

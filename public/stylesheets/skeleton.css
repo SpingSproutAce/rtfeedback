@@ -24,6 +24,7 @@
 	.container { position: relative; width: 840px; margin:auto; background:#FFF; padding: 60px; -webkit-border-radius:5px;  -moz-border-radius:5px;  border-radius:5px;top:5%;}
 	.container.center{text-align: center;}
 	.container.index{top:25%;}
+	.container.presentation{width: 600px; padding:60px 20px;}
 	
 /* #Tablet (Portrait)
 ================================================== */	

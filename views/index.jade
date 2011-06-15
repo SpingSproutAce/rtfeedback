@@ -1,13 +1,13 @@
 div.container.center.index
-	div.header
-		h1='2011 자바 개발자 컨퍼런스 피드백'
-	div.article
-		form(method='post', action='/login')
-			h4.subheader='What\'s your name?'
-			input(type='text', name='username')
-			- if (typeof(error) != 'undefined')
-				span(class='error_msg') #{error}
-			input(type='submit', value='Go!')
-	div.footer
-		a(href='http://springsprout.org') made by 봄싹
-
+  div.header
+    h1='2011 자바 개발자 컨퍼런스 피드백'
+  div.article
+    form(method='post', action='/login')
+      h4.subheader='What\'s your name?'
+      input(type='text', name='username')
+      - if (typeof(error) != 'undefined')
+        span(class='error_msg') #{error}
+      input(type='submit', value='Go!')
+  div.footer
+    small made by 
+      a(href='http://springsprout.org' , target="_blank") springsprout

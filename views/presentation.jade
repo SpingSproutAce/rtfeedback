@@ -4,129 +4,159 @@ script(type='text/javascript')
   $(function(){     
     var disText = '!Good';
     var likeText = 'Good';
-    var queText = 'Question';
+    var queText = 'Ask';
+    var commentBox =  '<li class=""> '+
+                      '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.gif"/></div> '+
+                      '  <div class="comment-body"> '+
+                      '   <p>{{body}}</p> '+
+                      '   <small>by <em>{{from}}</em> on <time data-timestamp="{{date}}">{{timeString}}</time></small> '+
+                      '  </div> '+
+                      '</li>';
+    var worker,commentBoxs,times;
+    var compileTempl = function(data){
+      var templ = commentBox;
+      $.each(data,function(key,value){
+        templ = templ.replace(new RegExp("\\{\\{" + key + "\\}\\}","gi"),value);
+      });
+      return templ;
+    },
+    
+    changeTimeString = function(now, createdTimestamp){
+      var second = Math.round((now-createdTimestamp)/1000);
+      if(second <= 5){
+        return 'now';
+      }else if(second <= 60){
+        return second+' seconds ago';
+      }else if(second < (60*60)){
+        return Math.floor(second / 60)+' minute'+((Math.floor(second / 60) !== 1)?'s':'')+' ago';
+      }else if(second < (24*60*60)){
+        return Math.floor(second / (60*60))+' hour'+((Math.floor(second / (60*60)) !== 1)?'s':'')+' ago';
+      }else{
+        var dateArrs = new Date(createdTimestamp).toGMTString().split(" ");
+        return dateArrs[1]+" "+dateArrs[2];
+      }
+    },
+    postMessage = function(){
+      if(!worker){
+        return false;
+      }
+      times = [];
+      commentBoxs = $('#rt_feedbacks li');
+      if(commentBoxs.length > 0){
+        $.each(commentBoxs,function(){
+          times.push($(this).find('time').data('timestamp'));
+        });
+      }
+      worker.postMessage(times);
+    },
+    setImageFileName = function(message){
+      switch(message.emotion) {
+        case disText: 
+          message.imgFileNm ='dis'; 
+          break;
+        case likeText:
+          message.imgFileNm ='like'; 
+          break;
+        case queText: 
+          message.imgFileNm ='ask'; 
+          break;
+        default: 
+          message.imgFileNm ='all'; 
+          break;
+      }
+      return message;
+    }
+    
     
     var socket = new io.Socket(null, {port: #{port}, rememberTransport:false});
+    
     socket.connect();
     socket.send({'type':'subscribe', 'channel':'#{p_id}'});
     socket.on('message', function(obj){
-      var message = obj.msg;
-      var countTag;
-      var emoticon;
-      // count up specific tag count
-      switch(message.emotion) {
-        case disText: countTag = $(".dis").next().next('.tag-count'); emoticon='dis'; break;
-        case likeText: countTag = $(".like").next().next('.tag-count'); emoticon='like'; break;
-        case queText: countTag = $(".que").next().next('.tag-count'); emoticon='que'; break;
-        default: break;
-      }
-      var count = countTag.text();
-      count++;
-      countTag.text(count);
-      
-      // count up total tag count
-      var totalTag = $(".all").next().next('.tag-count');
-      count = totalTag.text();
-      count++;
-      totalTag.text(count);
-      
-      // set emoticonImg
-      var emoticonImgURL = '/images/' + emoticon + '.gif';
-      var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
-      
-      // add message
-      //$("#rt_feedbacks").append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' +  emoticon + '">"' + message.body +  '"</span></li>');
-      var commentBox = '<li><div>';
-        commentBox += '<div class="emotion">' + emoticonImg + '</div>';
-        commentBox += '<div class="comment-text">';
-          commentBox += '<div class="comment-body">' + message.body + '</div>';
-          commentBox += '<div class="comment-meta"> feedback by <cite>' + message.from + '</cite> on ' + message.date + '</div>';
-        commentBox += '</div>';
-      commentBox += '</div></li>';
-      $("#rt_feedbacks").prepend(commentBox);
+      var message = setImageFileName(obj.msg);
+      message.timeString = changeTimeString((+new Date()),message.date);
+      $("#rt_feedbacks").prepend(compileTempl(message));
     });
+    
     $('#send_comment').click(function(){
       if(!'#{username}') {
         document.location.href = "/";
       }
-      var msg_body = $('#comment').val();
-      var msg_emotion = $('#emotion :selected').val();
+      var msg_body = $.trim($('#comment').val());
+      var msg_emotion = $('ul.tabs li a.active').data('emotion')||'';
       if(!msg_body) {
-        return;
+        return false;
       }
-      socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{username}', 'emotion':msg_emotion}});
-      $("#comment").attr('value', '');
-    });
-    
-    $('.tag').click(function(){
-      var emotion = $(this).attr('emotion');
-      var list = $("#rt_feedbacks");
       
-      $.getJSON('/comments/', {'to':'#{p_id}', 'emotion':emotion}, function(data){
-        list.empty();
-        $.each(data, function(index, message){
-          var emoticon;
-          switch(message.emotion) {
-            case disText: emoticon='dis'; break;
-            case likeText: emoticon='like'; break;
-            case queText: emoticon='que'; break;
-            default: break;
-          }
-          // set emoticonImg
-          var emoticonImgURL = '/images/' + emoticon + '.gif';
-          var emoticonImg = '<img class="emoticon" src="' + emoticonImgURL +'"></a>';
-          // add comment
-          // list.append("<li>" + message.from + emoticonImg + ' <span class="msg_body ' + emoticon + '">"' + message.body +  '"</span></li>');
-          var commentBox = '<li><div>';
-            commentBox += '<div class="emotion">' + emoticonImg + '</div>';
-            commentBox += '<div class="comment-text">';
-              commentBox += '<div class="comment-body">' + message.body + '</div>';
-              commentBox += '<div class="comment-meta"> feedback by <cite>' + message.from + '</cite> on ' + message.date + '</div>';
-            commentBox += '</div>';
-          commentBox += '</div></li>';
-          list.append(commentBox);
-        });
-      });
+      socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{username}', 'emotion':msg_emotion}});
+      $("#comment").val('');
     });
     
-    $('#clear_comment').click(function(){
-      $("#rt_feedbacks").empty();
-    });
-    
-    $('#comment').keypress(function(event){
-      if(event.which == '13') {
+   /*
+    * input enter event.
+    */    
+    $('#comment').keydown(function(e){
+      if(e.which === 13 || e.which === 10) {
         $('#send_comment').click();
       }
     });
     
+   /*
+    * tab click event
+    */
+    $('ul.tabs li > a').click(function(e){
+      e.preventDefault();
+      $(this).parents('ul').find('li > a.active').removeClass('active');
+      $(this).addClass('active');
+      var emotion = $(this).data('emotion');
+      var url = $(this).attr('href');
+      var list = $("#rt_feedbacks");
+      
+      $.getJSON(url, {'to':'#{p_id}', 'emotion':emotion}, function(data){
+        list.empty();
+        var now = (+new Date());
+        $.each(data, function(index, message){
+          message = setImageFileName(message);
+          message.timeString = changeTimeString(now,message.date);
+          $("#rt_feedbacks").prepend(compileTempl(message));
+        });
+      });
+    });
+    
+    $('ul.tabs li > a.active').click();
+    if (!!window.Worker) {
+      worker = new Worker('/javascripts/time-worker.js');
+      postMessage();
+      worker.onmessage = function(e){
+        if(e.data.length > 0 && commentBoxs.length > 0){
+          $.each(commentBoxs,function(idx){
+            $(this).find('time').html(e.data[idx]);
+          });
+        }
+        postMessage();
+      };
+    }
   });
-div(id='title_bar')
-  p #{username}, Let's react to #{title}
-div(id="input_bar")
-  select(id='emotion')
-    option(value='Good') Good
-    option(value='!Good') !Good
-    option(value='Question', selected=true) Question 
-  input(id='comment', name='comment', autocomplete='off', size='50')
-  button(id='send_comment') Send
-  button(id='clear_comment') Clear
-div(id='chat_box')
+div.container.presentation
+  div#titleBar
+    a(href="/list", class="button") return -1;
+    h4 #{username}, Let's react to #{title}
+  ul.tabs
+    li  
+      a(href="/comments/",class="active") 
+        strong *
+    li  
+      a(href="/comments/", data-emotion="Good") Good
+    li
+      a(href="/comments/", data-emotion="!Good") !Good
+    li
+      a(href="/comments/", data-emotion="Ask") Ask
+  div(id="input_bar")
+    input(id='comment', name='comment',type="text", autocomplete='off')
+    button(id='send_comment') .push();
   ul(id='rt_feedbacks')
-  div(id='statics_bar')
-    ul
-      li 
-        span(class='tag dis', emotion='!Good') !Good 
-        span(class='between-tag-count') X 
-        span(class='tag-count') #{disCount}
-      li 
-        span(class='tag like', emotion='Good') Good 
-        span(class='between-tag-count') X 
-        span(class='tag-count') #{likeCount}
-      li 
-        span(class='tag que', emotion='Question') Question 
-        span(class='between-tag-count') X 
-        span(class='tag-count') #{queCount}
-      li 
-        span(class='tag all') 전체 
-        span(class='between-tag-count') X 
-        span(class='tag-count') #{allCount}
+    li.loading
+      strong Loading...
+  div.footer
+    small made by 
+      a(href='http://springsprout.org' , target="_blank") springsprout
