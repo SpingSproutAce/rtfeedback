@@ -12,13 +12,13 @@ script(type='text/javascript')
         },
         emotionOf = {
           '*'     : {'imgNm':'all' ,'cnt' : #{allCnt}},
-          'Good'  : {'imgNm':'like','cnt' : #{goodCnt}},
-          '!Good' : {'imgNm':'dis' ,'cnt' : #{ngCnt}},
+          'Good'  : {'imgNm':'good','cnt' : #{goodCnt}},
+          '!Good' : {'imgNm':'ng' ,'cnt' : #{ngCnt}},
           'Ask'   : {'imgNm':'ask' ,'cnt' : #{askCnt}},
         },
         worker,commentBoxs,times,
         commentBox =  '<li data-emotion="{{emotion}}" > '+
-                      '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.gif"/></div> '+
+                      '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.png"/></div> '+
                       '  <div class="comment-body"> '+
                       '   <p>{{body}}</p> '+
                       '   <small>by <em>{{from}}</em> on <time data-timestamp="{{date}}">{{timeString}}</time></small> '+
