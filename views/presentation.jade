@@ -92,6 +92,10 @@ script(type='text/javascript')
       $("#rt_feedbacks").prepend(newComment);
     });
     
+    $(window).unload(function() {
+      socket.send({'type':'unsubscribe', 'channel':valOf.pId});
+    });
+    
     $('#send_comment').click(function(){
       if(!valOf.uname) {
         document.location.href = "/";
@@ -179,7 +183,7 @@ div.container.presentation
       em(data-emotion="Ask") #{askCnt} 
       label Ask
     li.last-child
-      em(data-emotion="Users") 0 
+      em(data-emotion="Users") #{userCount}
       label Users
   ul.tabs
     li  

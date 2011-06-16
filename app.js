@@ -74,7 +74,6 @@ socket.on('connection', function(client){
 		var action = message.type;
 		var msg = message.msg;
 		if(action === 'subscribe'){
-			
 			var clientList = channelMap.get(channel);
 			if(!clientList) {
 				// console.log("empty");
@@ -102,10 +101,18 @@ socket.on('connection', function(client){
 				console.log('send to: ' + i);
 				clientList[i].send({'msg':newComments});
 			}
+		} else if(action === 'unsubscribe') {
+			var clientList = channelMap.get(channel);
+			var newClientList = new Array();
+			for(var i in clientList) {
+				if(i != clientSessionId) {
+					newClientList[i] = clientList[i];
+				}
+			}
+			channelMap.put(channel, newClientList);
 		}		
 	});
 	client.on('disconnection', function(){
-		
 	});
 });
 
@@ -157,13 +164,21 @@ app.get('/p/:id', function(req, res){
 		              'ngCnt'    : 0,
 		              'goodCnt'  : 0, 
 		              'askCount' : 0, 
-		              'allCount' : 0
+		              'allCount' : 0,
+		              'userCount': 0
 		             },
 			presentFn = function(){
 				Presentations.findById(req.params.id, function(err, p){
 					if(!p){
 						res.redirect('/list');
 					} else {
+						var list = channelMap.get(params.p_id);
+						var count = 1;
+						for(var i in list){
+							count++;
+						}
+						console.log(count);
+						params['userCount'] = count;
 						params.title = p.title;
 						res.render('presentation',params);
 					}
