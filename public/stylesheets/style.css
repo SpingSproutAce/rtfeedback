@@ -137,6 +137,7 @@ ol, ul {list-style: none; }
 /* #Tabs (activate in app.js)
 ================================================== */
 	ul.tabs { 
+	  clear:both;
 		display: block;
 		margin: 0 0 15px 0;
 		padding: 0;
@@ -316,4 +317,31 @@ div.footer{
 }
 ul.tabs li strong{
   font-size:16px;
+}
+ul.emotionCnt{
+  max-width:300px;
+  padding:5px 0;
+  border:1px solid #BBB;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -moz-box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+  -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+  box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+}
+ul.emotionCnt li:last-child{
+  border-right:none;
+  margin-right:0;
+}
+ul.emotionCnt li{
+  width:70px;
+  float:left;
+  text-align:center;
+  margin:0 5px 0 0;
+  border-right:1px solid #999;
+  font:13px/1.25 "Georgia", "Times New Roman", Helvetica, Arial, sans-serif;
+}
+ul.emotionCnt li label{
+  font:12px/1.25 "HelveticaNeue","HelveticaNeue",Arial;
+  color: #666;
 }

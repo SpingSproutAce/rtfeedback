@@ -1,18 +1,30 @@
 script(src='/socket.io/socket.io.js')
 script(src='/javascripts/jquery-1.6.1.min.js')
 script(type='text/javascript')
-  $(function(){     
-    var disText = '!Good';
-    var likeText = 'Good';
-    var queText = 'Ask';
-    var commentBox =  '<li class=""> '+
+  $(function(){
+    var valOf = {
+          uname : '#{username}',
+          port  : #{port},
+          pId   : '#{p_id}',
+          good  : 'Good',
+          nG    : '!Good',
+          ask   : 'Ask'
+        },
+        emotionOf = {
+          '*'     : {'imgNm':'all' ,'cnt' : #{allCnt}},
+          'Good'  : {'imgNm':'like','cnt' : #{goodCnt}},
+          '!Good' : {'imgNm':'dis' ,'cnt' : #{ngCnt}},
+          'Ask'   : {'imgNm':'ask' ,'cnt' : #{askCnt}},
+        },
+        worker,commentBoxs,times,
+        commentBox =  '<li data-emotion="{{emotion}}" > '+
                       '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.gif"/></div> '+
                       '  <div class="comment-body"> '+
                       '   <p>{{body}}</p> '+
                       '   <small>by <em>{{from}}</em> on <time data-timestamp="{{date}}">{{timeString}}</time></small> '+
                       '  </div> '+
                       '</li>';
-    var worker,commentBoxs,times;
+    /* Below there are functions */
     var compileTempl = function(data){
       var templ = commentBox;
       $.each(data,function(key,value){
@@ -50,45 +62,50 @@ script(type='text/javascript')
       worker.postMessage(times);
     },
     setImageFileName = function(message){
-      switch(message.emotion) {
-        case disText: 
-          message.imgFileNm ='dis'; 
-          break;
-        case likeText:
-          message.imgFileNm ='like'; 
-          break;
-        case queText: 
-          message.imgFileNm ='ask'; 
-          break;
-        default: 
-          message.imgFileNm ='all'; 
-          break;
-      }
+      message.emotion = message.emotion||'*';
+      message.imgFileNm = emotionOf[message.emotion].imgNm;
       return message;
-    }
+    },
+    updateEmotionCount = function(message){
+      message.emotion = message.emotion||'*';
+      emotionOf[message.emotion].cnt += 1;
+      $('ul.emotionCnt li > em[data-emotion="'+message.emotion+'"]').html(emotionOf[message.emotion].cnt);
+      if(message.emotion !== '*'){
+        emotionOf['*'].cnt += 1;
+        $('ul.emotionCnt li > em[data-emotion="*"]').html(emotionOf['*'].cnt);  
+      }
+    };
     
-    
-    var socket = new io.Socket(null, {port: #{port}, rememberTransport:false});
+    var socket = new io.Socket(null, {port: valOf.port, rememberTransport:false});
     
     socket.connect();
-    socket.send({'type':'subscribe', 'channel':'#{p_id}'});
+    socket.send({'type':'subscribe', 'channel':valOf.pId});
     socket.on('message', function(obj){
-      var message = setImageFileName(obj.msg);
+      var message = setImageFileName(obj.msg),
+          currentEmotion = $('ul.tabs li > a.active').data('emotion');
       message.timeString = changeTimeString((+new Date()),message.date);
-      $("#rt_feedbacks").prepend(compileTempl(message));
+      updateEmotionCount(message);
+      var newComment = $(compileTempl(message));
+      if(currentEmotion !== '*' && message.emotion !== currentEmotion){
+        newComment.hide();
+      }
+      $("#rt_feedbacks").prepend(newComment);
     });
     
     $('#send_comment').click(function(){
-      if(!'#{username}') {
+      if(!valOf.uname) {
         document.location.href = "/";
       }
-      var msg_body = $.trim($('#comment').val());
-      var msg_emotion = $('ul.tabs li a.active').data('emotion')||'';
-      if(!msg_body) {
+      var msg = {
+            'body'    : $.trim($('#comment').val()),
+            'emotion' : $('ul.tabs li a.active').data('emotion'),
+            'from'    : valOf.uname
+          };
+      if(!msg.body) {
         return false;
       }
-      
-      socket.send({'type':'publish', 'channel':'#{p_id}', 'msg':{'body':msg_body, 'from':'#{username}', 'emotion':msg_emotion}});
+
+      socket.send({'type':'publish', 'channel':valOf.pId, 'msg':msg});
       $("#comment").val('');
     });
     
@@ -99,34 +116,26 @@ script(type='text/javascript')
       if(e.which === 13 || e.which === 10) {
         $('#send_comment').click();
       }
-    });
+    }).focus();
     
    /*
     * tab click event
     */
     $('ul.tabs li > a').click(function(e){
       e.preventDefault();
-      $(this).parents('ul').find('li > a.active').removeClass('active');
-      $(this).addClass('active');
+      $(this).parents('ul').find('li > a.active').removeClass('active').end().end().addClass('active');
       var emotion = $(this).data('emotion');
-      var url = $(this).attr('href');
-      var list = $("#rt_feedbacks");
+      if(emotion === '*'){
+        $('#rt_feedbacks li').show();
+      }else{
+        $('#rt_feedbacks li').hide().filter('li[data-emotion="'+$(this).data('emotion')+'"]').show();
+      }
       
-      $.getJSON(url, {'to':'#{p_id}', 'emotion':emotion}, function(data){
-        list.empty();
-        var now = (+new Date());
-        $.each(data, function(index, message){
-          message = setImageFileName(message);
-          message.timeString = changeTimeString(now,message.date);
-          $("#rt_feedbacks").prepend(compileTempl(message));
-        });
-      });
+      $('#comment').focus();
     });
-    
-    $('ul.tabs li > a.active').click();
+  
     if (!!window.Worker) {
-      worker = new Worker('/javascripts/time-worker.js');
-      postMessage();
+      worker = new Worker('/javascripts/time-worker.js');      
       worker.onmessage = function(e){
         if(e.data.length > 0 && commentBoxs.length > 0){
           $.each(commentBoxs,function(idx){
@@ -136,14 +145,42 @@ script(type='text/javascript')
         postMessage();
       };
     }
+    
+    (function(){
+      $.getJSON('/comments/', {'to':valOf.pId}, function(data){
+        $("#rt_feedbacks").empty();
+        var now = (+new Date());
+        $.each(data, function(index, message){
+          message = setImageFileName(message);
+          message.timeString = changeTimeString(now,message.date);
+          $("#rt_feedbacks").prepend(compileTempl(message));
+        });
+        postMessage();
+      });
+    })();
+    
   });
+
 div.container.presentation
   div#titleBar
     a(href="/list", class="button") return -1;
     h4 #{username}, Let's react to #{title}
+  ul.emotionCnt.clearfix
+    li 
+      em(data-emotion="*") #{allCnt} 
+      label All
+    li 
+      em(data-emotion="Good") #{goodCnt}
+      label Good
+    li 
+      em(data-emotion="!Good") #{ngCnt} 
+      label !Good
+    li 
+      em(data-emotion="Ask") #{askCnt} 
+      label Ask
   ul.tabs
     li  
-      a(href="/comments/",class="active") 
+      a(href="/comments/",class="active", data-emotion="*") 
         strong *
     li  
       a(href="/comments/", data-emotion="Good") Good

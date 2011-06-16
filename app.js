@@ -133,7 +133,6 @@ app.get('/list', function(req, res){
 app.get('/comments', function(req, res){
 	res.contentType('application/json');
 	var commentList = Comments.find(req.query,function(err, docs){
-
 		res.send(docs);
 	});
 });
@@ -146,10 +145,10 @@ app.get('/p/:id', function(req, res){
 		              'username':req.session.username, 
 		              'p_id':req.params.id, 
 		              'title':'',
-		              'disCount'   : 0,
-		              'likeCount'  : 0, 
-		              'askCount'   : 0, 
-		              'allCount'   : 0
+		              'ngCnt'    : 0,
+		              'goodCnt'  : 0, 
+		              'askCount' : 0, 
+		              'allCount' : 0
 		             },
 			presentFn = function(){
 				Presentations.findById(req.params.id, function(err, p){
@@ -172,10 +171,10 @@ app.get('/p/:id', function(req, res){
 					arg.callBack.call(this,args);
 				});
 			},
-			functions  = [{'emotion' : '!Good', 'countNm' : 'disCount', 'callBack' :countFn},
-						  {'emotion' : 'Good', 'countNm' : 'likeCount', 'callBack' :countFn},
-						  {'emotion' : 'Ask', 'countNm' : 'askCount', 'callBack' :countFn},
-						  {'countNm' : 'allCount', 'callBack' :presentFn}
+			functions  = [{'emotion' : '!Good', 'countNm' : 'ngCnt', 'callBack' :countFn},
+						  {'emotion' : 'Good', 'countNm' : 'goodCnt', 'callBack' :countFn},
+						  {'emotion' : 'Ask', 'countNm' : 'askCnt', 'callBack' :countFn},
+						  {'countNm' : 'allCnt', 'callBack' :presentFn}
 						 ],
 			idx = 0;
 			countFn(functions);
