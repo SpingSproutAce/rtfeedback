@@ -66,14 +66,15 @@ app.configure('production', function(){
 
 var channelMap = new HashMap();
 socket.on('connection', function(client){
-	var clientSessionId = client.sessionId;
 	client.on('message', function(message){
 		console.log(message);
-		
+		var clientSessionId = client.sessionId;
+		console.log('message from: ' + clientSessionId);
 		var channel = message.channel;
 		var action = message.type;
 		var msg = message.msg;
 		if(action === 'subscribe'){
+			
 			var clientList = channelMap.get(channel);
 			if(!clientList) {
 				// console.log("empty");
@@ -83,7 +84,6 @@ socket.on('connection', function(client){
 			} else {
 				clientList[clientSessionId] = client;
 			}
-			console.log(clientList[clientSessionId] === client);
 		} else if(action === 'publish') {
 			// save
 			var newComments = new Comments();
@@ -99,6 +99,7 @@ socket.on('connection', function(client){
 			// publish
 			var clientList = channelMap.get(channel);
 			for(var i in clientList) {
+				console.log('send to: ' + i);
 				clientList[i].send({'msg':newComments});
 			}
 		}		
