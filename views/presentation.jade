@@ -106,7 +106,7 @@ script(type='text/javascript')
       }
 
       socket.send({'type':'publish', 'channel':valOf.pId, 'msg':msg});
-      $("#comment").val('');
+      $("#comment").val('').focus();
     });
     
    /*
@@ -175,7 +175,7 @@ div.container.presentation
     li 
       em(data-emotion="!Good") #{ngCnt} 
       label !Good
-    li 
+    li.last-child
       em(data-emotion="Ask") #{askCnt} 
       label Ask
   ul.tabs

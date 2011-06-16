@@ -329,7 +329,7 @@ ul.emotionCnt{
   -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .2);
   box-shadow: 0 0 3px rgba(0, 0, 0, .2);
 }
-ul.emotionCnt li:last-child{
+ul.emotionCnt li.last-child{
   border-right:none;
   margin-right:0;
 }
