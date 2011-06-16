@@ -1,1 +1,5 @@
-Why should I have to tell you about this project?
+1. install node.js
+
+2. open console and execute "node app.js"
+
+3. go to "http://localhost:3000"
