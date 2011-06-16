@@ -13,7 +13,7 @@ var app = module.exports = express.createServer();
 var socket = io.listen(app);
 
 var host=process.env.VCAP_APP_HOST || 'localhost';
-var port=process.env.VCAP_APP_PORT || 3000;
+var port=process.env.VCAP_APP_PORT || 11000;
 
 // HashMap
 var HashMap = function(){   
@@ -110,7 +110,11 @@ socket.on('connection', function(client){
 
 // Routes
 app.get('/', function(req, res){
-	res.render('index');
+	if(req.session.username) {
+		res.redirect('list');
+	} else {
+		res.render('index');
+	}
 });
 
 app.post('/login', function(req, res){
@@ -124,10 +128,14 @@ app.post('/login', function(req, res){
 });
 
 app.get('/list', function(req, res){
-	// get the presentation list
-	Presentations.find(function(err, result){
-		res.render('list', {'username':req.session.username, 'result':result});
-	});
+	if(!req.session.username) {
+		res.redirect('/');		
+	} else {
+		// get the presentation list
+		Presentations.find(function(err, result){
+			res.render('list', {'username':req.session.username, 'result':result});
+		});
+	}
 });
 
 app.get('/comments', function(req, res){
