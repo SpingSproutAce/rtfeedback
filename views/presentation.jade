@@ -67,7 +67,6 @@ script(type='text/javascript')
           times.push($(this).find('time').data('timestamp'));
         });
       }
-      console.log({'isCancel':false,'times':times,'emotion':emotion,'timeOut':timeOut||10000});
       worker.postMessage({'isCancel':false,'times':times,'emotion':emotion,'timeOut':timeOut||10000});
     },
     
