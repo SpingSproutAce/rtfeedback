@@ -23,13 +23,13 @@ onmessage = function (e) {
     clearTimeout(timeoutObject);
   }
   
-  if(e.data.length > 0){
+  if(e.data.times.length > 0){
     var timeStrings = [],
         now = (+new Date)+ 10000,
         i;
-    for(i = 0; i <  e.data.length; i++){
-      e.data[i] = changeTimeString(now,e.data[i]);
+    for(i = 0; i <  e.data.times.length; i++){
+      e.data.times[i] = changeTimeString(now,e.data.times[i]);
     }
   }
-  timeoutObject = setTimeout(function(){sendPostMessage(e.data);},10000);
+  timeoutObject = setTimeout(function(){sendPostMessage(e.data);},e.data.timeOut);
 };

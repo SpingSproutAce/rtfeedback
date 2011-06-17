@@ -2,6 +2,9 @@ script(src='/socket.io/socket.io.js')
 script(src='/javascripts/jquery-1.6.1.min.js')
 script(type='text/javascript')
   $(function(){
+    if (typeof console === 'undefined' || typeof console.log === 'undefined') {
+      window.console = {log : function(msg){}};
+    }
     var valOf = {
           uname : '#{username}',
           port  : #{port},
@@ -11,12 +14,12 @@ script(type='text/javascript')
           ask   : 'Ask'
         },
         emotionOf = {
-          '*'     : {'imgNm':'all' ,'cnt' : #{allCnt}},
-          'Good'  : {'imgNm':'good','cnt' : #{goodCnt}},
-          '!Good' : {'imgNm':'ng' ,'cnt' : #{ngCnt}},
-          'Ask'   : {'imgNm':'ask' ,'cnt' : #{askCnt}},
+          '*'     : {'imgNm':'all' , 'cnt' : #{allCnt},  'skip':0, 'id':'#allList',  listNode:'', 'isLoad':true},
+          'Good'  : {'imgNm':'good', 'cnt' : #{goodCnt}, 'skip':0, 'id':'#goodList', listNode:'', 'isLoad':false},
+          '!Good' : {'imgNm':'ng' ,  'cnt' : #{ngCnt},   'skip':0, 'id':'#ngList',   listNode:'', 'isLoad':false},
+          'Ask'   : {'imgNm':'ask' , 'cnt' : #{askCnt},  'skip':0, 'id':'#askList',  listNode:'', 'isLoad':false}
         },
-        worker,commentBoxs,times,
+        worker,sessionId,
         commentBox =  '<li data-emotion="{{emotion}}" > '+
                       '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.png"/></div> '+
                       '  <div class="comment-body"> '+
@@ -48,18 +51,18 @@ script(type='text/javascript')
         return dateArrs[1]+" "+dateArrs[2];
       }
     },
-    postMessage = function(){
+    postMessage = function(emotion,timeOut){
       if(!worker){
         return false;
       }
-      times = [];
-      commentBoxs = $('#rt_feedbacks li');
-      if(commentBoxs.length > 0){
-        $.each(commentBoxs,function(){
+      var times = [];
+      emotionOf[emotion].listNode = $(emotionOf[emotion].id+' > li');
+      if(getListNode(emotion).length > 0){
+        $.each(emotionOf[emotion].listNode,function(){
           times.push($(this).find('time').data('timestamp'));
         });
       }
-      worker.postMessage(times);
+      worker.postMessage({'times':times,'emotion':emotion,'timeOut':timeOut||10000});
     },
     setImageFileName = function(message){
       message.emotion = message.emotion||'*';
@@ -74,22 +77,60 @@ script(type='text/javascript')
         emotionOf['*'].cnt += 1;
         $('ul.emotionCnt li > em[data-emotion="*"]').html(emotionOf['*'].cnt);  
       }
+    },
+    currentEmotion = function(){
+      return $('ul.tabs li > a.active').data('emotion');
+    },
+    getListNode = function(emotion){
+      return emotionOf[emotion].listNode;
+    },
+    loadList = function(emotion){
+      var param = {'to':valOf.pId};
+      if(emotion !== '*'){
+        param.emotion = emotion;
+      }
+      $.getJSON('/comments/', param, function(data){
+        $(emotionOf[emotion].id).empty();
+        var now = (+new Date());
+        $.each(data, function(index, message){
+          message = setImageFileName(message);
+          message.timeString = changeTimeString(now,message.date);
+          $(emotionOf[emotion].id).append(compileTempl(message));
+        });
+        emotionOf[emotion].isLoad = true;
+        postMessage(emotion);
+      });
+
     };
     
     var socket = new io.Socket(null, {port: valOf.port, rememberTransport:false});
     
     socket.connect();
     socket.send({'type':'subscribe', 'channel':valOf.pId});
+    socket.on('reconnect',function(){
+      socket.send({'type':'subscribe', 'channel':valOf.pId,'sessionId':sessionId});
+    });
     socket.on('message', function(obj){
+      if(typeof obj === 'string'){
+        return false;
+      }
+      if(obj.checked){
+        sessionId = obj.sessionId;
+        return false;
+      }
+      if(sessionId !== obj.sessionId){
+        return false;
+      }
       var message = setImageFileName(obj.msg),
-          currentEmotion = $('ul.tabs li > a.active').data('emotion');
+          emotion = currentEmotion();
       message.timeString = changeTimeString((+new Date()),message.date);
       updateEmotionCount(message);
       var newComment = $(compileTempl(message));
-      if(currentEmotion !== '*' && message.emotion !== currentEmotion){
-        newComment.hide();
+      
+      if(emotion !== '*' && message.emotion !== '*'){
+        $(emotionOf['*'].id).prepend(newComment);
       }
-      $("#rt_feedbacks").prepend(newComment);
+      $(emotionOf[message.emotion].id).prepend(newComment);
     });
     
     $('#send_comment').click(function(){
@@ -98,7 +139,7 @@ script(type='text/javascript')
       }
       var msg = {
             'body'    : $.trim($('#comment').val()),
-            'emotion' : $('ul.tabs li a.active').data('emotion'),
+            'emotion' : currentEmotion(),
             'from'    : valOf.uname
           };
       if(!msg.body) {
@@ -125,40 +166,39 @@ script(type='text/javascript')
       e.preventDefault();
       $(this).parents('ul').find('li > a.active').removeClass('active').end().end().addClass('active');
       var emotion = $(this).data('emotion');
-      if(emotion === '*'){
-        $('#rt_feedbacks li').show();
+      $('ul.rt_feedbacks').fadeOut('fast');
+      $(emotionOf[emotion].id).fadeIn('fast');
+      if(!emotionOf[emotion].isLoad){
+        loadList(emotion);
       }else{
-        $('#rt_feedbacks li').hide().filter('li[data-emotion="'+$(this).data('emotion')+'"]').show();
+        postMessage(emotion,1);
       }
-      
       $('#comment').focus();
     });
   
     if (!!window.Worker) {
       worker = new Worker('/javascripts/time-worker.js');      
       worker.onmessage = function(e){
-        if(e.data.length > 0 && commentBoxs.length > 0){
-          $.each(commentBoxs,function(idx){
-            $(this).find('time').html(e.data[idx]);
+        if(e.data.times.length > 0 && getListNode(e.data.emotion).length > 0){
+          $.each(getListNode(e.data.emotion),function(idx){
+            $(this).find('time').html(e.data.times[idx]);
           });
         }
-        postMessage();
+        postMessage(e.data.emotion);
       };
     }
     
-    (function(){
-      $.getJSON('/comments/', {'to':valOf.pId}, function(data){
-        $("#rt_feedbacks").empty();
-        var now = (+new Date());
-        $.each(data, function(index, message){
-          message = setImageFileName(message);
-          message.timeString = changeTimeString(now,message.date);
-          $("#rt_feedbacks").prepend(compileTempl(message));
-        });
-        postMessage();
-      });
-    })();
+  /*
+    $(window).scroll(function(){
+      if($(window).scrollTop() == $(document).height() - $(window).height()){
+        if(emotionOf[currentEmotion()].cnt > 25){
+          //console.log('event!!');
+        }
+      }
+    });
+  */
     
+    loadList('*');
   });
 
 div.container.presentation
@@ -191,7 +231,16 @@ div.container.presentation
   div(id="input_bar")
     input(id='comment', name='comment',type="text", autocomplete='off')
     button(id='send_comment') .push();
-  ul(id='rt_feedbacks')
+  ul#allList.rt_feedbacks
+    li.loading
+      strong Loading...
+  ul#goodList.rt_feedbacks
+    li.loading
+      strong Loading...
+  ul#ngList.rt_feedbacks
+    li.loading
+      strong Loading...
+  ul#askList.rt_feedbacks
     li.loading
       strong Loading...
   div.footer

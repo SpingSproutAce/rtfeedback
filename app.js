@@ -13,11 +13,11 @@ var app = module.exports = express.createServer();
 var socket = io.listen(app);
 
 var host=process.env.VCAP_APP_HOST || 'localhost';
-var port=process.env.VCAP_APP_PORT || 3000;
+var port=process.env.VCAP_APP_PORT || 10001;
 
 // HashMap
 var HashMap = function(){   
-    this.map = new Array();
+    this.map = {};
 };   
 HashMap.prototype = {   
     put : function(key, value){   
@@ -30,7 +30,7 @@ HashMap.prototype = {
         return this.map;
     },   
     clear : function(){   
-        this.map = new Array();
+        this.map = {};
     },   
     getKeys : function(){   
         var keys = new Array();   
@@ -38,6 +38,18 @@ HashMap.prototype = {
             keys.push(i);
         }   
         return keys;
+    },
+    hasKey : function(key){
+      return (this.get(key) !== undefined);
+    },
+    remove : function(key,subKey){
+      if(this.hasKey(key)){
+        if(subKey){
+          delete this.map[key][subKey];
+        }else{
+          delete this.map[key];
+        }
+      }
     }
 };
 
@@ -65,25 +77,27 @@ app.configure('production', function(){
 // Socket IO
 
 var channelMap = new HashMap();
+var clientMap  = new HashMap();
 socket.on('connection', function(client){
 	var clientSessionId = client.sessionId;
 	client.on('message', function(message){
-		console.log(message);
-		
+		//console.log(message);
 		var channel = message.channel;
 		var action = message.type;
 		var msg = message.msg;
+		var clientList = channelMap.get(channel);
+		
 		if(action === 'subscribe'){
-			var clientList = channelMap.get(channel);
 			if(!clientList) {
-				// console.log("empty");
-				var clientList = new Array();
-				clientList[clientSessionId] = client;
-				channelMap.put(channel, clientList);
-			} else {
-				clientList[clientSessionId] = client;
+				clientList= {};
 			}
-			console.log(clientList[clientSessionId] === client);
+			if(message.sessionId){
+			  channelMap.put(channel, message.sessionId);   
+			}
+		  clientList[clientSessionId] = client;
+			channelMap.put(channel, clientList);
+			clientMap.put(clientSessionId,channel);
+			client.send({'checked':true,'sessionId':clientSessionId});
 		} else if(action === 'publish') {
 			// save
 			var newComments = new Comments();
@@ -95,16 +109,16 @@ socket.on('connection', function(client){
 			newComments.save(function(err){
 				//console.log(err);
 			});
-			
 			// publish
-			var clientList = channelMap.get(channel);
-			for(var i in clientList) {
-				clientList[i].send({'msg':newComments});
+			clientList = channelMap.get(channel);
+			for(var sessionId in clientList) {
+				clientList[sessionId].send({'msg':newComments,'sessionId':sessionId});
 			}
-		}		
+		}
 	});
-	client.on('disconnection', function(){
-		
+	client.on('disconnect', function(){
+		channelMap.remove(clientMap.get(clientSessionId),clientSessionId);
+		clientMap.remove(clientSessionId);
 	});
 });
 
@@ -132,8 +146,8 @@ app.get('/list', function(req, res){
 
 app.get('/comments', function(req, res){
 	res.contentType('application/json');
-	var commentList = Comments.find(req.query,function(err, docs){
-		res.send(docs);
+	Comments.find(req.query, ['emotion','body','date','from']).limit(25).skip(0).sort('date', -1).execFind( function(err, docs) {
+  	res.send(docs);
 	});
 });
 
