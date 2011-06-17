@@ -77,7 +77,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: 'let me know who you are' }));
+  app.use(express.session({ secret: 'let me know who you are','cookie':{'maxAge': 72000000}}));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
@@ -94,6 +94,10 @@ app.configure('production', function(){
 
 var channelMap = new HashMap();
 var clientKeyMap  = new HashMap();
+var removeClient = function(channalId,sessionId){
+  var _clentMap = channelMap.get(channalId||'');
+  _clentMap && !_clentMap.isEmpty() && _clentMap.remove(sessionId||'');
+};
 socket.on('connection', function(client){
   var clientSessionId = client.sessionId;
 	client.on('message', function(message){
@@ -108,7 +112,7 @@ socket.on('connection', function(client){
 				channelMap.put(channel, clientMap);
 			} 
 			if(message.sessionId){ 
-			  channelMap.get(channel).remove(message.sessionId);
+			  removeClient(channel,message.sessionId);
 			}
 			clientMap.put(clientSessionId,client);
 			clientKeyMap.put(clientSessionId,channel);
@@ -135,7 +139,7 @@ socket.on('connection', function(client){
 		}
 	});
 	client.on('disconnect', function(){
-		channelMap.get(clientKeyMap.get(clientSessionId)).remove(clientSessionId);
+		removeClient(clientKeyMap.get(clientSessionId),clientSessionId);
 		clientKeyMap.remove(clientSessionId);
 	});
 });
@@ -196,8 +200,10 @@ app.get('/p/:id', function(req, res){
 					if(!p){
 						res.redirect('/list');
 					} else {
-						params['userCnt'] = (channelMap.get(req.params.id).size()||1);
+					  var _clientMap = channelMap.get(req.params.id);
+						params['userCnt'] = (_clientMap && !_clientMap.isEmpty() && _clientMap.size()||1)||1;
 						params.title = p.title;
+						params.serverTime = (+new Date());
 						res.render('presentation',params);
 					}
 				});

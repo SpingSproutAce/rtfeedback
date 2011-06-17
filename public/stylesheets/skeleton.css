@@ -44,7 +44,7 @@
 	/* Note: Design for a width of 320px */
 	
 	@media only screen and (max-width: 767px) {
-		.container { width: 310px;top:3%;padding:20px 5px !important; }
+		.container { width: 310px;top:0;padding:20px 5px !important; }
     .container.presentation{width:310px;top:0!important;}
     ul.emotionCnt li{width:55px;font-size:12px;}
     ul.emotionCnt li.last-child{width:53px;}

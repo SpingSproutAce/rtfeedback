@@ -20,6 +20,7 @@ script(type='text/javascript')
           'Ask'   : {'imgNm':'ask' , 'cnt' : #{askCnt},  'skip':0, 'id':'#askList',  listNode:'', 'isLoad':false}
         },
         worker,sessionId,
+        offsetTime = #{serverTime},
         commentBox =  '<li data-emotion="{{emotion}}" > '+
                       '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.png"/></div> '+
                       '  <div class="comment-body"> '+
@@ -37,7 +38,7 @@ script(type='text/javascript')
     },
     
     changeTimeString = function(now, createdTimestamp){
-      var second = Math.round((now-createdTimestamp)/1000);
+      var second = Math.round(((now-createdTimestamp)+offsetTime)/1000);
       if(second <= 5){
         return 'now';
       }else if(second <= 60){
@@ -67,7 +68,7 @@ script(type='text/javascript')
           times.push($(this).find('time').data('timestamp'));
         });
       }
-      worker.postMessage({'isCancel':false,'times':times,'emotion':emotion,'timeOut':timeOut||10000});
+      worker.postMessage({'isCancel':false,'times':times,'emotion':emotion,'timeOut':timeOut||10000,'offsetTime':offsetTime});
     },
     
     setImageFileName = function(message){
@@ -227,7 +228,11 @@ script(type='text/javascript')
       postMessage();
       $(this).focus(windowFocusEvent);
     });
-    
+    /* sync client time for server time. */
+    (function(){
+      offsetTime -= (new Date().getTime());
+    })();
+
     loadList('*');
   });
 
