@@ -12,8 +12,8 @@ ol, ul {list-style: none; }
 /* #Basic Styles
 ================================================== */
 	* {padding: 0px;margin: 0px;}
-	html,body{height: 100%;margin:0;padding:0;}
-	body {background: #DEEBFD;font: 14px/1 "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;color: #333;}
+	html,body{margin:0;padding:0;height:100%;}
+	body {font: 14px/1 "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;color: #333;background-color:#DEEBFD;}
 /* #Typography
 ================================================== */
 	h1, h2, h3, h4, h5, h6 { 
@@ -343,4 +343,10 @@ ul.emotionCnt li{
 ul.emotionCnt li label{
   font:12px/1.25 "HelveticaNeue","HelveticaNeue",Arial;
   color: #666;
+}
+div#loading{
+  display:none;
+  text-align:center;
+  margin-top:-10px;
+  margin-bottom:20px;
 }

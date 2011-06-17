@@ -14,12 +14,12 @@ script(type='text/javascript')
           ask   : 'Ask'
         },
         emotionOf = {
-          '*'     : {'imgNm':'all' , 'cnt' : #{allCnt},  'skip':0, 'id':'#allList',  listNode:'', 'isLoad':true},
-          'Good'  : {'imgNm':'good', 'cnt' : #{goodCnt}, 'skip':0, 'id':'#goodList', listNode:'', 'isLoad':false},
-          '!Good' : {'imgNm':'ng' ,  'cnt' : #{ngCnt},   'skip':0, 'id':'#ngList',   listNode:'', 'isLoad':false},
-          'Ask'   : {'imgNm':'ask' , 'cnt' : #{askCnt},  'skip':0, 'id':'#askList',  listNode:'', 'isLoad':false}
+          '*'     : {'imgNm':'all' , 'cnt' : #{allCnt},  'pageCnt':#{allPageCnt},  'id':'#allList',  listNode:'', 'isLoad':false},
+          'Good'  : {'imgNm':'good', 'cnt' : #{goodCnt}, 'pageCnt':#{goodPageCnt}, 'id':'#goodList', listNode:'', 'isLoad':false},
+          '!Good' : {'imgNm':'ng' ,  'cnt' : #{ngCnt},   'pageCnt':#{ngPageCnt},       'id':'#ngList',   listNode:'', 'isLoad':false},
+          'Ask'   : {'imgNm':'ask' , 'cnt' : #{askCnt},  'pageCnt':#{askPageCnt},      'id':'#askList',  listNode:'', 'isLoad':false}
         },
-        worker,sessionId,
+        worker,sessionId,timeoutObject,loading,
         offsetTime = #{serverTime},
         commentBox =  '<li data-emotion="{{emotion}}" > '+
                       '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.png"/></div> '+
@@ -114,10 +114,42 @@ script(type='text/javascript')
           message.timeString = changeTimeString(currentTime,message.date);
           $(emotionOf[emotion].id).append(compileTempl(message));
         });
-        emotionOf[emotion].isLoad = true;
         postMessage(emotion);
+        emotionOf[emotion].isLoad = true;
+        if(emotion === '*' && jQuery.browser.opera){
+          $('body').height('auto');
+        }
       });
+    },
 
+    morePage = function(emotion){
+      if($('div#loading:visible').length === 0){
+        $('div#loading').fadeIn('fast');
+      }
+      if(loading){
+        return false;
+      }
+      loading = true;
+      return false;
+      
+      var param = {'to':valOf.pId};
+      if(emotion !== '*'){
+        param.emotion = emotion;
+      }
+      $.getJSON('/comments/', param, function(data){
+        $(emotionOf[emotion].id).empty();
+        var currentTime = new Date().getTime();
+        $.each(data, function(index, message){
+          message = setImageFileName(message);
+          message.timeString = changeTimeString(currentTime,message.date);
+          $(emotionOf[emotion].id).append(compileTempl(message));
+        });
+        postMessage(emotion);
+        emotionOf[emotion].isLoad = true;
+        if(emotion === '*' && jQuery.browser.opera){
+          $('body').height('auto');
+        }
+      });
     },
     
     windowFocusEvent = function(){
@@ -190,6 +222,7 @@ script(type='text/javascript')
       if($(this).hasClass('active')){
         return false;
       }
+      $('div#loading').hide();
       $(this).parents('ul').find('li > a.active').removeClass('active').end().end().addClass('active');
       var emotion = $(this).data('emotion');
       $('ul.rt_feedbacks').fadeOut('fast');
@@ -210,19 +243,26 @@ script(type='text/javascript')
             $(this).find('time').html(e.data.times[idx]);
           });
         }
-        postMessage(e.data.emotion);
+        postMessage(e.data.emotion,e.data.timeOut);
+      };
+    }else{
+      postMessage = function(emotion,timeOut){
+        if(timeoutObject){
+          clearTimeout(timeoutObject);  
+        }
+        if(!emotion){
+          return false;
+        }
+        timeoutObject = setTimeout(function(){
+          var now = (new Date().getTime());
+          $.each($(emotionOf[emotion].id+' > li'), function(){
+            $(this).find('time').html(changeTimeString(now,$(this).find('time').data('timestamp')));
+          });
+          postMessage(emotion,timeOut);
+        },timeOut||10000);
       };
     }
     
-  /*
-    $(window).scroll(function(){
-      if($(window).scrollTop() == $(document).height() - $(window).height()){
-        if(emotionOf[currentEmotion()].cnt > 25){
-          //console.log('event!!');
-        }
-      }
-    });
-  */
     $(window).focus(windowFocusEvent)
     .blur(function(){
       postMessage();
@@ -234,8 +274,15 @@ script(type='text/javascript')
     })();
 
     loadList('*');
+    $(window).scroll(function(){
+      console.log($(window).scrollTop() == $(document).height() - $(window).height());
+      if($(window).scrollTop() == $(document).height() - $(window).height()){        
+        if(emotionOf[currentEmotion()].pageCnt > 0){
+          morePage(currentEmotion());
+        }
+      }
+    });
   });
-
 div.container.presentation
   div#titleBar
     a(href="/list", class="button") return -1;
@@ -281,6 +328,8 @@ div.container.presentation
   ul#askList.rt_feedbacks
     li.loading
       strong Loading...
+  div#loading
+    img(src="/images/loading.gif")
   div.footer
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout

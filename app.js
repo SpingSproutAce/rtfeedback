@@ -7,14 +7,14 @@ var express = require('express'),
 	models = require('./lib/models'),
 	Comments = models.Comments,
 	Presentations = models.Presentations;
+	
 
 var app = module.exports = express.createServer();
-
 var socket = io.listen(app);
 
 var host=process.env.VCAP_APP_HOST || 'localhost';
 var port=process.env.VCAP_APP_PORT || 11000;
-
+var pageSize = 25;
 // HashMap
 var HashMap = function(){   
     this.map = {};
@@ -176,6 +176,8 @@ app.get('/list', function(req, res){
 
 app.get('/comments', function(req, res){
 	res.contentType('application/json');
+	console.log(req);
+	console.log(req.query);
 	Comments.find(req.query, ['emotion','body','date','from']).limit(25).skip(0).sort('date', -1).execFind( function(err, docs) {
   	res.send(docs);
 	});
@@ -189,11 +191,15 @@ app.get('/p/:id', function(req, res){
 		              'username':req.session.username, 
 		              'p_id':req.params.id, 
 		              'title':'',
-		              'ngCnt'    : 0,
-		              'goodCnt'  : 0, 
-		              'askCnt' : 0, 
-		              'allCnt' : 0,
-		              'userCnt': 0
+		              'ngCnt'   : 0,
+		              'goodCnt' : 0, 
+		              'askCnt'  : 0, 
+		              'allCnt'  : 0,
+		              'userCnt' : 0,
+		              'ngPageCnt'   : 0,
+		              'goodPageCnt' : 0, 
+		              'askPageCnt'  : 0, 
+		              'allPageCnt'  : 0
 		             },
 			presentFn = function(){
 				Presentations.findById(req.params.id, function(err, p){
@@ -215,14 +221,15 @@ app.get('/p/:id', function(req, res){
 					param.emotion = arg.emotion;
 				}
 				Comments.find(param).count(function(err, count){
-					params[arg.countNm] = count;
+					params[arg.countNm+'Cnt'] = count;
+					params[arg.countNm+'PageCnt'] = Math.round((count-pageSize)/pageSize);
 					arg.callBack.call(this,args);
 				});
 			},
-			functions  = [{'emotion' : '!Good', 'countNm' : 'ngCnt', 'callBack' :countFn},
-						  {'emotion' : 'Good', 'countNm' : 'goodCnt', 'callBack' :countFn},
-						  {'emotion' : 'Ask', 'countNm' : 'askCnt', 'callBack' :countFn},
-						  {'countNm' : 'allCnt', 'callBack' :presentFn}
+			functions  = [{'emotion' : '!Good', 'countNm' : 'ng', 'callBack' :countFn},
+						  {'emotion' : 'Good', 'countNm' : 'good', 'callBack' :countFn},
+						  {'emotion' : 'Ask', 'countNm' : 'ask', 'callBack' :countFn},
+						  {'countNm' : 'all', 'callBack' :presentFn}
 						 ],
 			idx = 0;
 			countFn(functions);
