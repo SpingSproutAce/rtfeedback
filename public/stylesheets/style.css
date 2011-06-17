@@ -262,16 +262,10 @@ ol, ul {list-style: none; }
 		color: #444; 
 }
 /** custom****/
-ul.visibleHide{
-  position: absolute;
-  visibility: hidden;
-}
 ul#allList {
   display:block;
 }
 ul.rt_feedbacks {
-	width: 100%;
-	height: 100%;
 	padding: 5px;
 	margin-top: 10px;
 	margin-bottom: 10px;
@@ -312,9 +306,6 @@ div#titleBar a.button{
 }
 div#titleBar h4{
   display:inline;
-}
-input#comment{
-  width:200px;
 }
 div#input_bar input#comment{
   margin-left: 0;

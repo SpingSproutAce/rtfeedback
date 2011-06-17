@@ -24,7 +24,7 @@
 	.container { position: relative; width: 840px; margin:auto; background:#FFF; padding: 60px; -webkit-border-radius:5px;  -moz-border-radius:5px;  border-radius:5px;top:5%;}
 	.container.center{text-align: center;}
 	.container.index{top:25%;}
-	.container.presentation{width: 600px; padding:60px 20px;}
+	.container.presentation{width:600px; padding:60px 20px;}
 	
 /* #Tablet (Portrait)
 ================================================== */	
@@ -32,8 +32,9 @@
 	/* Note: Design for a width of 768px */
 
 	@media only screen and (min-width: 768px) and (max-width: 959px) {
-		.container { width: 748px; top:5%;padding:30px 10px;}
+		.container { width: 748px; top:5%; padding:30px 10px !important;}
 		.container.index{top:25%;}
+		.container.presentation{width:748px;top:0 !important;}
 	}
 	
 	
@@ -43,7 +44,13 @@
 	/* Note: Design for a width of 320px */
 	
 	@media only screen and (max-width: 767px) {
-		.container { width: 290px;top:0 !important;padding:0 5px; }
+		.container { width: 310px;top:3%;padding:20px 5px !important; }
+    .container.presentation{width:310px;top:0!important;}
+    ul.emotionCnt li{width:55px;font-size:12px;}
+    ul.emotionCnt li.last-child{width:53px;}
+    ul.emotionCnt{max-width:310px;}
+    div#input_bar input#comment{margin-left: 0;width:210px;}
+    div#titleBar h4{font-size:12px;}
 	}	 
 	
 	
@@ -53,7 +60,8 @@
 	/* Note: Design for a width of 480px */
 	
 	@media only screen and (min-width: 480px) and (max-width: 767px) {
-		.container { width: 410px;top:0 !important;padding:0 5px;}
+		.container { width: 470px;top:5% !important;padding:20px 5px !important;}
+		.container.presentation{width:470px;top:0;}
 	}
 	 
 	

@@ -27,7 +27,7 @@ onmessage = function (e) {
   }
   if(e.data.times.length > 0){
     var timeStrings = [],
-        now = (+new Date)+ 10000,
+        now = (new Date().getTime())+ 10000,
         i;
     for(i = 0; i <  e.data.times.length; i++){
       e.data.times[i] = changeTimeString(now,e.data.times[i]);

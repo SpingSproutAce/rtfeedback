@@ -18,10 +18,24 @@ var port=process.env.VCAP_APP_PORT || 11000;
 // HashMap
 var HashMap = function(){   
     this.map = {};
+    this._length = 0;
 };   
-HashMap.prototype = {   
+HashMap.prototype = {
+    size : function(isPlus){
+      if(isPlus === undefined){
+        return this._length;
+      }
+      if(isPlus){
+        this._length += 1;
+      }else{
+        if(this._length){
+          this._length -= 1;
+        }
+      }
+      return this;
+    },
     put : function(key, value){   
-        this.map[key] = value;
+        this.size(true).map[key]= value;
     },   
     get : function(key){   
         return this.map[key];
@@ -30,7 +44,7 @@ HashMap.prototype = {
         return this.map;
     },   
     clear : function(){   
-        this.map = {};
+        this.map = new Object();
     },   
     getKeys : function(){   
         var keys = new Array();   
@@ -42,17 +56,19 @@ HashMap.prototype = {
     hasKey : function(key){
       return (this.get(key) !== undefined);
     },
-    remove : function(key,subKey){
+    remove : function(key){
       if(this.hasKey(key)){
-        if(subKey){
-          delete this.map[key][subKey];
-        }else{
-          delete this.map[key];
-        }
+        delete this.map[key];
+        this.size(false);
       }
+    },
+    isEmpty : function(){
+      for ( var name in this.map ) {
+        return false;
+      }
+      return true;
     }
 };
-
 // Configuration
 
 app.configure(function(){
@@ -77,27 +93,28 @@ app.configure('production', function(){
 // Socket IO
 
 var channelMap = new HashMap();
-var clientMap  = new HashMap();
+var clientKeyMap  = new HashMap();
 socket.on('connection', function(client){
-    var clientSessionId = client.sessionId;
+  var clientSessionId = client.sessionId;
 	client.on('message', function(message){
 		//console.log(message);
 		var channel = message.channel;
 		var action = message.type;
 		var msg = message.msg;
-		var clientList = channelMap.get(channel);
-		
+		var clientMap = channelMap.get(channel);		
 		if(action === 'subscribe'){
-			if(!clientList) {
-				clientList= {};
+			if(clientMap === undefined) {
+				clientMap = new HashMap();
+				channelMap.put(channel, clientMap);
+			} 
+			if(message.sessionId){ 
+			  channelMap.get(channel).remove(message.sessionId);
 			}
-			if(message.sessionId){
-			  channelMap.put(channel, message.sessionId);   
-			}
-		  clientList[clientSessionId] = client;
-			channelMap.put(channel, clientList);
-			clientMap.put(clientSessionId,channel);
-			client.send({'checked':true,'sessionId':clientSessionId});
+			clientMap.put(clientSessionId,client);
+			clientKeyMap.put(clientSessionId,channel);
+			
+			client.send({'checked':true,'sessionId':clientSessionId,'userCnt':clientMap.size()});
+			
     } else if(action === 'publish') {
 			// save
 			var newComments = new Comments();
@@ -110,15 +127,16 @@ socket.on('connection', function(client){
 				//console.log(err);
 			});
 			// publish
-			clientList = channelMap.get(channel);
-			for(var sessionId in clientList) {
-				clientList[sessionId].send({'msg':newComments,'sessionId':sessionId});
+			var clients = channelMap.get(channel).getAll();
+			var userCnt = clientMap.size();
+			for(var sessionId in clients) {
+				clientMap.get(sessionId).send({'msg':newComments,'sessionId':sessionId,'userCnt':userCnt});
 			}
 		}
 	});
 	client.on('disconnect', function(){
-		channelMap.remove(clientMap.get(clientSessionId),clientSessionId);
-		clientMap.remove(clientSessionId);
+		channelMap.get(clientKeyMap.get(clientSessionId)).remove(clientSessionId);
+		clientKeyMap.remove(clientSessionId);
 	});
 });
 
@@ -169,22 +187,16 @@ app.get('/p/:id', function(req, res){
 		              'title':'',
 		              'ngCnt'    : 0,
 		              'goodCnt'  : 0, 
-		              'askCount' : 0, 
-		              'allCount' : 0,
-		              'userCount': 0
+		              'askCnt' : 0, 
+		              'allCnt' : 0,
+		              'userCnt': 0
 		             },
 			presentFn = function(){
 				Presentations.findById(req.params.id, function(err, p){
 					if(!p){
 						res.redirect('/list');
 					} else {
-						var list = channelMap.get(params.p_id);
-						var count = 1;
-						for(var i in list){
-							count++;
-						}
-						console.log(count);
-						params['userCount'] = count;
+						params['userCnt'] = (channelMap.get(req.params.id).size()||1);
 						params.title = p.title;
 						res.render('presentation',params);
 					}

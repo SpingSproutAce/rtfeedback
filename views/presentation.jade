@@ -51,6 +51,7 @@ script(type='text/javascript')
         return dateArrs[1]+" "+dateArrs[2];
       }
     },
+   
     postMessage = function(emotion,timeOut){
       if(!worker){
         return false;
@@ -66,13 +67,16 @@ script(type='text/javascript')
           times.push($(this).find('time').data('timestamp'));
         });
       }
+      console.log({'isCancel':false,'times':times,'emotion':emotion,'timeOut':timeOut||10000});
       worker.postMessage({'isCancel':false,'times':times,'emotion':emotion,'timeOut':timeOut||10000});
     },
+    
     setImageFileName = function(message){
       message.emotion = message.emotion||'*';
       message.imgFileNm = emotionOf[message.emotion].imgNm;
       return message;
     },
+    
     updateEmotionCount = function(message){
       message.emotion = message.emotion||'*';
       emotionOf[message.emotion].cnt += 1;
@@ -82,12 +86,21 @@ script(type='text/javascript')
         $('ul.emotionCnt li > em[data-emotion="*"]').html(emotionOf['*'].cnt);  
       }
     },
+    
+    updateUserCount = function(cnt){
+      if(cnt){
+        $('ul.emotionCnt li > em[data-emotion="Users"]').html(cnt);  
+      }
+    },
+    
     currentEmotion = function(){
       return $('ul.tabs li > a.active').data('emotion');
     },
+    
     getListNode = function(emotion){
       return emotionOf[emotion].listNode;
     },
+    
     loadList = function(emotion){
       var param = {'to':valOf.pId};
       if(emotion !== '*'){
@@ -95,16 +108,21 @@ script(type='text/javascript')
       }
       $.getJSON('/comments/', param, function(data){
         $(emotionOf[emotion].id).empty();
-        var now = (+new Date());
+        var currentTime = new Date().getTime();
         $.each(data, function(index, message){
           message = setImageFileName(message);
-          message.timeString = changeTimeString(now,message.date);
+          message.timeString = changeTimeString(currentTime,message.date);
           $(emotionOf[emotion].id).append(compileTempl(message));
         });
         emotionOf[emotion].isLoad = true;
         postMessage(emotion);
       });
 
+    },
+    
+    windowFocusEvent = function(){
+      postMessage(currentEmotion());
+      $(this).unbind('focus');
     };
     
     var socket = new io.Socket(null, {port: valOf.port, rememberTransport:false});
@@ -118,19 +136,21 @@ script(type='text/javascript')
       if(typeof obj === 'string'){
         return false;
       }
+      updateUserCount(obj.userCnt);
       if(obj.checked){
         sessionId = obj.sessionId;
         return false;
       }
+      //exception of duplication push.
       if(sessionId !== obj.sessionId){
         return false;
       }
       var message = setImageFileName(obj.msg),
           emotion = currentEmotion();
-      message.timeString = changeTimeString((+new Date()),message.date);
+      message.timeString = changeTimeString(new Date().getTime(),message.date);
       updateEmotionCount(message);
       var newComment = compileTempl(message);
-     if(emotion !== '*' && message.emotion !== '*'){
+      if(emotion !== '*' && message.emotion !== '*'){
         $(emotionOf['*'].id).prepend(newComment);
       }
       $(emotionOf[message.emotion].id).prepend(newComment);
@@ -203,13 +223,13 @@ script(type='text/javascript')
       }
     });
   */
+    $(window).focus(windowFocusEvent)
+    .blur(function(){
+      postMessage();
+      $(this).focus(windowFocusEvent);
+    });
     
     loadList('*');
-    $(window).focus(function(){
-      postMessage(currentEmotion());
-    }).blur(function(){
-      
-    });
   });
 
 div.container.presentation
@@ -230,7 +250,7 @@ div.container.presentation
       em(data-emotion="Ask") #{askCnt} 
       label Ask
     li.last-child
-      em(data-emotion="Users") #{userCount}
+      em(data-emotion="Users") #{userCnt}
       label Users
   ul.tabs
     li  
