@@ -55,6 +55,10 @@ script(type='text/javascript')
       if(!worker){
         return false;
       }
+      if(!emotion){
+        worker.postMessage({'isCancel':true});  
+        return false;
+      }
       var times = [];
       emotionOf[emotion].listNode = $(emotionOf[emotion].id+' > li');
       if(getListNode(emotion).length > 0){
@@ -62,7 +66,7 @@ script(type='text/javascript')
           times.push($(this).find('time').data('timestamp'));
         });
       }
-      worker.postMessage({'times':times,'emotion':emotion,'timeOut':timeOut||10000});
+      worker.postMessage({'isCancel':false,'times':times,'emotion':emotion,'timeOut':timeOut||10000});
     },
     setImageFileName = function(message){
       message.emotion = message.emotion||'*';
@@ -125,9 +129,8 @@ script(type='text/javascript')
           emotion = currentEmotion();
       message.timeString = changeTimeString((+new Date()),message.date);
       updateEmotionCount(message);
-      var newComment = $(compileTempl(message));
-      
-      if(emotion !== '*' && message.emotion !== '*'){
+      var newComment = compileTempl(message);
+     if(emotion !== '*' && message.emotion !== '*'){
         $(emotionOf['*'].id).prepend(newComment);
       }
       $(emotionOf[message.emotion].id).prepend(newComment);
@@ -164,10 +167,13 @@ script(type='text/javascript')
     */
     $('ul.tabs li > a').click(function(e){
       e.preventDefault();
+      if($(this).hasClass('active')){
+        return false;
+      }
       $(this).parents('ul').find('li > a.active').removeClass('active').end().end().addClass('active');
       var emotion = $(this).data('emotion');
       $('ul.rt_feedbacks').fadeOut('fast');
-      $(emotionOf[emotion].id).fadeIn('fast');
+      $(emotionOf[emotion].id).show();
       if(!emotionOf[emotion].isLoad){
         loadList(emotion);
       }else{
@@ -199,6 +205,11 @@ script(type='text/javascript')
   */
     
     loadList('*');
+    $(window).focus(function(){
+      postMessage(currentEmotion());
+    }).blur(function(){
+      
+    });
   });
 
 div.container.presentation
@@ -215,9 +226,12 @@ div.container.presentation
     li 
       em(data-emotion="!Good") #{ngCnt} 
       label !Good
-    li.last-child
+    li
       em(data-emotion="Ask") #{askCnt} 
       label Ask
+    li.last-child
+      em(data-emotion="Users") #{userCount}
+      label Users
   ul.tabs
     li  
       a(href="/comments/",class="active", data-emotion="*") 

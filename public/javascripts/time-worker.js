@@ -22,7 +22,9 @@ onmessage = function (e) {
   if(timeoutObject){
     clearTimeout(timeoutObject);
   }
-  
+  if(e.data.isCancel){
+    return false;
+  }
   if(e.data.times.length > 0){
     var timeStrings = [],
         now = (+new Date)+ 10000,

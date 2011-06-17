@@ -1,1 +1,5 @@
-Why should I have to tell you about this project?
+1. Install the 'node.js'
+
+2. Open new console and execute "node app.js"
+
+3. Let's meet at "http://localhost:3000"

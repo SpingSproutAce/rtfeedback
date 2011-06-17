@@ -79,7 +79,7 @@ app.configure('production', function(){
 var channelMap = new HashMap();
 var clientMap  = new HashMap();
 socket.on('connection', function(client){
-	var clientSessionId = client.sessionId;
+    var clientSessionId = client.sessionId;
 	client.on('message', function(message){
 		//console.log(message);
 		var channel = message.channel;
@@ -98,7 +98,7 @@ socket.on('connection', function(client){
 			channelMap.put(channel, clientList);
 			clientMap.put(clientSessionId,channel);
 			client.send({'checked':true,'sessionId':clientSessionId});
-		} else if(action === 'publish') {
+    } else if(action === 'publish') {
 			// save
 			var newComments = new Comments();
 			newComments.to = channel;
@@ -124,7 +124,11 @@ socket.on('connection', function(client){
 
 // Routes
 app.get('/', function(req, res){
-	res.render('index');
+	if(req.session.username) {
+		res.redirect('list');
+	} else {
+		res.render('index');
+	}
 });
 
 app.post('/login', function(req, res){
@@ -138,10 +142,14 @@ app.post('/login', function(req, res){
 });
 
 app.get('/list', function(req, res){
-	// get the presentation list
-	Presentations.find(function(err, result){
-		res.render('list', {'username':req.session.username, 'result':result});
-	});
+	if(!req.session.username) {
+		res.redirect('/');		
+	} else {
+		// get the presentation list
+		Presentations.find(function(err, result){
+			res.render('list', {'username':req.session.username, 'result':result});
+		});
+	}
 });
 
 app.get('/comments', function(req, res){
@@ -162,13 +170,21 @@ app.get('/p/:id', function(req, res){
 		              'ngCnt'    : 0,
 		              'goodCnt'  : 0, 
 		              'askCount' : 0, 
-		              'allCount' : 0
+		              'allCount' : 0,
+		              'userCount': 0
 		             },
 			presentFn = function(){
 				Presentations.findById(req.params.id, function(err, p){
 					if(!p){
 						res.redirect('/list');
 					} else {
+						var list = channelMap.get(params.p_id);
+						var count = 1;
+						for(var i in list){
+							count++;
+						}
+						console.log(count);
+						params['userCount'] = count;
 						params.title = p.title;
 						res.render('presentation',params);
 					}
