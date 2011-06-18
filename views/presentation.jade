@@ -136,7 +136,7 @@ script(type='text/javascript')
       
       $.getJSON('/comments/', param, function(data){
         $('div#loading').hide();
-        pageLoadCallBack(data,emotion,500);
+        pageLoadCallBack(data,emotion,50);
         loading = false;
       });
     },
