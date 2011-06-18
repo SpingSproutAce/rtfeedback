@@ -2,8 +2,8 @@ var timeoutObject,
     sendPostMessage = function(msg){
       postMessage(msg);
     },
-    changeTimeString = function(now, createdTimestamp){
-      var second = Math.round((now-createdTimestamp)/1000);
+    changeTimeString = function(now, createdTimestamp,offsetTime){
+      var second = Math.round((now-createdTimestamp+offsetTime)/1000);
       if(second <= 5){
         return 'now';
       }else if(second <= 60){
@@ -30,7 +30,7 @@ onmessage = function (e) {
         now = (new Date().getTime())+ 10000,
         i;
     for(i = 0; i <  e.data.times.length; i++){
-      e.data.times[i] = changeTimeString(now,e.data.times[i]);
+      e.data.times[i] = changeTimeString(now,e.data.times[i],e.data.offsetTime);
     }
   }
   timeoutObject = setTimeout(function(){sendPostMessage(e.data);},e.data.timeOut);
