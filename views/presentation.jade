@@ -156,7 +156,7 @@ script(type='text/javascript')
     },
     
     windowFocusEvent = function(){
-      postMessage(currentEmotion());
+      postMessage(currentEmotion(),1);
       $(this).unbind('focus');
     },
     
