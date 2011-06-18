@@ -353,3 +353,8 @@ div#loading{
   margin-top:-10px;
   margin-bottom:20px;
 }
+ul.list{
+  list-style: disc outside none;
+  text-align: left;
+}
+
