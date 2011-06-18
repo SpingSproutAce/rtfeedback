@@ -167,7 +167,7 @@ app.get('/list', function(req, res){
     res.redirect('/');    
   } else {
     // get the presentation list
-    Presentations.find().sort({'body': 1},function(err, result){
+    Presentations.find(function(err, result){
       res.render('list', {'username':req.session.username, 'result':result});
     });
   }
@@ -238,8 +238,7 @@ app.get('/p/:id', function(req, res){
 });
 
 app.get('/list/mgt', function(req, res){
-  Presentations.find().sort({'body': 1}, function(err, result){
-    console.log(result);
+  Presentations.find(function(err, result){
     res.render("list-mgt", {'result':result});
   });
 });
