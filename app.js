@@ -167,7 +167,7 @@ app.get('/list', function(req, res){
     res.redirect('/');    
   } else {
     // get the presentation list
-    Presentations.find().sort({'body', 1},function(err, result){
+    Presentations.find().sort({'body': 1},function(err, result){
       res.render('list', {'username':req.session.username, 'result':result});
     });
   }
