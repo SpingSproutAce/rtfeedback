@@ -86,7 +86,7 @@ ol, ul {list-style: none; }
 	  text-decoration: none;
 	  text-shadow: 0 1px rgba(255, 255, 255, .75);
 	  cursor: pointer;
-	  margin-bottom: 20px;
+	  margin-bottom: 0;
 	  line-height: 21px;
 	  font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; }
 	  
@@ -267,7 +267,7 @@ ul#allList {
 }
 ul.rt_feedbacks {
 	padding: 5px;
-	margin-top: 10px;
+	margin-top: 30px;
 	margin-bottom: 10px;
 	margin-right: 5px;
 	display:none;
@@ -300,6 +300,9 @@ ul.rt_feedbacks li div.comment-body{
 }
 ul.rt_feedbacks li div.comment-body small{
   color:#888;
+}
+div#titleBar{
+  margin-bottom:20px;
 }
 div#titleBar a.button{
   margin-right:15px;
