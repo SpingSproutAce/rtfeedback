@@ -16,8 +16,8 @@ script(type='text/javascript')
         emotionOf = {
           '*'     : {'imgNm':'all' , 'cnt' : #{allCnt},  'pageCnt':#{allPageCnt},  'id':'#allList',  listNode:'', 'isLoad':false},
           'Good'  : {'imgNm':'good', 'cnt' : #{goodCnt}, 'pageCnt':#{goodPageCnt}, 'id':'#goodList', listNode:'', 'isLoad':false},
-          '!Good' : {'imgNm':'ng' ,  'cnt' : #{ngCnt},   'pageCnt':#{ngPageCnt},       'id':'#ngList',   listNode:'', 'isLoad':false},
-          'Ask'   : {'imgNm':'ask' , 'cnt' : #{askCnt},  'pageCnt':#{askPageCnt},      'id':'#askList',  listNode:'', 'isLoad':false}
+          '!Good' : {'imgNm':'ng' ,  'cnt' : #{ngCnt},   'pageCnt':#{ngPageCnt},   'id':'#ngList',   listNode:'', 'isLoad':false},
+          'Ask'   : {'imgNm':'ask' , 'cnt' : #{askCnt},  'pageCnt':#{askPageCnt},  'id':'#askList',  listNode:'', 'isLoad':false}
         },
         worker,sessionId,timeoutObject,loading,
         offsetTime = #{serverTime},
@@ -108,53 +108,70 @@ script(type='text/javascript')
       }
       $.getJSON('/comments/', param, function(data){
         $(emotionOf[emotion].id).empty();
-        var currentTime = new Date().getTime();
-        $.each(data, function(index, message){
-          message = setImageFileName(message);
-          message.timeString = changeTimeString(currentTime,message.date);
-          $(emotionOf[emotion].id).append(compileTempl(message));
-        });
+        pageLoadCallBack(data,emotion);
         postMessage(emotion);
         emotionOf[emotion].isLoad = true;
-        if(emotion === '*' && jQuery.browser.opera){
-          $('body').height('auto');
-        }
       });
     },
 
     morePage = function(emotion){
       if($('div#loading:visible').length === 0){
         $('div#loading').fadeIn('fast');
+      }else{
+        return false;
       }
       if(loading){
         return false;
       }
       loading = true;
-      return false;
       
       var param = {'to':valOf.pId};
       if(emotion !== '*'){
         param.emotion = emotion;
       }
+
+      emotionOf[emotion].pageCnt -= 1;
+      param.date = $(emotionOf[emotion].id+' > li:last-child time').data('timestamp');
+      
+      
       $.getJSON('/comments/', param, function(data){
-        $(emotionOf[emotion].id).empty();
+        $('div#loading').hide();
+        pageLoadCallBack(data,emotion,500);
+        loading = false;
+      });
+    },
+    pageLoadCallBack = function(data, emotion,timeOut){
+      if(data){
         var currentTime = new Date().getTime();
         $.each(data, function(index, message){
           message = setImageFileName(message);
           message.timeString = changeTimeString(currentTime,message.date);
           $(emotionOf[emotion].id).append(compileTempl(message));
         });
-        postMessage(emotion);
-        emotionOf[emotion].isLoad = true;
         if(emotion === '*' && jQuery.browser.opera){
           $('body').height('auto');
         }
-      });
+      }
+      setWindowScrollEvent(timeOut);
     },
     
     windowFocusEvent = function(){
       postMessage(currentEmotion());
       $(this).unbind('focus');
+    },
+    
+    windowScrollEvent = function(){
+      if($(this).scrollTop() >= ($('.footer').position().top)-$(this).height()-50){        
+        if(emotionOf[currentEmotion()].pageCnt > 0){
+          morePage(currentEmotion());
+          $(this).unbind('scroll');
+        }
+      }
+    },
+    setWindowScrollEvent = function(timeOut){
+      setTimeout(function(){
+        $(window).scroll(windowScrollEvent);
+      },timeOut||500);
     };
     
     var socket = new io.Socket(null, {port: valOf.port, rememberTransport:false});
@@ -274,21 +291,14 @@ script(type='text/javascript')
     })();
 
     loadList('*');
-    $(window).scroll(function(){
-      console.log($(window).scrollTop() == $(document).height() - $(window).height());
-      if($(window).scrollTop() == $(document).height() - $(window).height()){        
-        if(emotionOf[currentEmotion()].pageCnt > 0){
-          morePage(currentEmotion());
-        }
-      }
-    });
+    //alert($(window).scroll());
   });
 div.container.presentation
   div#titleBar
     a(href="/list", class="button") return -1;
     h4 #{username}, Let's react to #{title}
   ul.emotionCnt.clearfix
-    li 
+    li.first-child
       em(data-emotion="*") #{allCnt} 
       label All
     li 

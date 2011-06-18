@@ -45,9 +45,11 @@
 	
 	@media only screen and (max-width: 767px) {
 		.container { width: 310px;top:0;padding:20px 5px !important; }
+		.container.index{top:0;}
     .container.presentation{width:310px;top:0!important;}
     ul.emotionCnt li{width:55px;font-size:12px;}
     ul.emotionCnt li.last-child{width:53px;}
+    ul.emotionCnt li.first-child{width:58px;}
     ul.emotionCnt{max-width:310px;}
     div#input_bar input#comment{margin-left: 0;width:210px;}
     div#titleBar h4{font-size:12px;}
