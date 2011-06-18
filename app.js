@@ -238,7 +238,7 @@ app.get('/p/:id', function(req, res){
 });
 
 app.get('/list/mgt', function(req, res){
-  Presentations.find().sort({'body', 1}, function(err, result){
+  Presentations.find().sort({'body': 1}, function(err, result){
     console.log(result);
     res.render("list-mgt", {'result':result});
   });
