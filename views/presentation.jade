@@ -260,7 +260,7 @@ script(type='text/javascript')
             $(this).find('time').html(e.data.times[idx]);
           });
         }
-        postMessage(e.data.emotion);
+        postMessage(currentEmotion());
       };
     }else{
       postMessage = function(emotion,timeOut){
@@ -275,7 +275,7 @@ script(type='text/javascript')
           $.each($(emotionOf[emotion].id+' > li'), function(){
             $(this).find('time').html(changeTimeString(now,$(this).find('time').data('timestamp')));
           });
-          postMessage(emotion);
+          postMessage(currentEmotion());
         },timeOut||10000);
       };
     }
