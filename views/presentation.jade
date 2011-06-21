@@ -313,6 +313,10 @@ div.container.presentation
     li.last-child
       em(data-emotion="Users") #{userCnt}
       label Users
+  p By #{allUsersCnt} Users:
+  ul.users
+    - each u in allUsers
+      li #{u}
   ul.tabs
     li  
       a(href="/comments/",class="active", data-emotion="*") 

@@ -200,7 +200,9 @@ app.get('/p/:id', function(req, res){
                   'ngPageCnt'   : 0,
                   'goodPageCnt' : 0, 
                   'askPageCnt'  : 0, 
-                  'allPageCnt'  : 0
+                  'allPageCnt'  : 0,
+                  'allUserCnt'  : 0,
+                  'allUsers'    :''
                  },
       presentFn = function(){
         Presentations.findById(req.params.id, function(err, p){
@@ -227,13 +229,23 @@ app.get('/p/:id', function(req, res){
           arg.callBack.call(this,args);
         });
       },
-      functions  = [{'emotion' : '!Good', 'countNm' : 'ng', 'callBack' :countFn},
+      countUserFn = function(args){
+	    var arg = args[idx++]
+		,param = {'to':params.p_id};
+		Comments.collection.distinct('from', param, function(err, data){
+		  params['allUsers'] = data;
+		  params['allUsersCnt'] = data.length;
+		  arg.callBack.call(this,args);
+		});
+	  },
+      functions  = [{'callBack':countFn},
+              {'emotion' : '!Good', 'countNm' : 'ng', 'callBack' :countFn},
               {'emotion' : 'Good', 'countNm' : 'good', 'callBack' :countFn},
               {'emotion' : 'Ask', 'countNm' : 'ask', 'callBack' :countFn},
               {'countNm' : 'all', 'callBack' :presentFn}
              ],
       idx = 0;
-      countFn(functions);
+      countUserFn(functions);
   }
 });
 
@@ -298,8 +310,6 @@ app.get('/p/delrm/:id', function(req, res){
   });
   res.redirect("/list/mgt/");
 });
-
-
 
 app.listen(port);
 console.log("Express server listening on port %d", app.address().port);
