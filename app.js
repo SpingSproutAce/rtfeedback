@@ -14,7 +14,7 @@ var app = module.exports = express.createServer();
 var socket = io.listen(app);
 
 var host=process.env.VCAP_APP_HOST || 'localhost';
-var port=process.env.VCAP_APP_PORT || 11100;
+var port=process.env.VCAP_APP_PORT || 11000;
 var pageSize = 25;
 // HashMap
 var HashMap = function(){   
