@@ -313,14 +313,13 @@ app.get('/p/delrm/:id', function(req, res){
 });
 
 app.get('/listset/:conf', function(req, res){
-	console.log(req.params.conf);
 	var confName = req.params.conf;
 	Presentations.find(function(err, data){
 		data.forEach(function(p){
-			if(!p.conference) {
+			// if(!p.conference) {
 				p.conference = confName;
 				p.save();
-			}
+			// }
 		})
 	});
 	res.redirect("/list");
