@@ -1,6 +1,7 @@
 /**
  * Module dependencies.
  */
+const confName = 'jco';
 
 var express = require('express'),
   io = require('socket.io'),
@@ -167,7 +168,7 @@ app.get('/list', function(req, res){
     res.redirect('/');    
   } else {
     // get the presentation list
-    Presentations.find().sort('body', 1).execFind(function(err, result){
+    Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
       res.render('list', {'username':req.session.username, 'result':result});
     });
   }
@@ -309,6 +310,20 @@ app.get('/p/delrm/:id', function(req, res){
     }
   });
   res.redirect("/list/mgt/");
+});
+
+app.get('/listset/:conf', function(req, res){
+	console.log(req.params.conf);
+	var confName = req.params.conf;
+	Presentations.find(function(err, data){
+		data.forEach(function(p){
+			if(!p.conference) {
+				p.conference = confName;
+				p.save();
+			}
+		})
+	});
+	res.redirect("/list");
 });
 
 app.listen(port);
