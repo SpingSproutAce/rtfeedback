@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
-const confName = 'jco';
+const confName = 'sdec';
 
 var express = require('express'),
   io = require('socket.io'),
@@ -273,7 +273,7 @@ app.get('/p/:id', authorization, function(req, res){
 });
 
 app.get('/list/mgt', function(req, res){
-  Presentations.find().sort('body', 1).execFind(function(err, result){
+  Presentations.find().sort('conference',1).sort('body', 1).execFind(function(err, result){
     res.render("list-mgt", {'result':result});
   });
 });
@@ -284,6 +284,7 @@ app.post('/list/add', function(req, res){
   presentation.title = req.body.title;
   presentation.speaker = req.body.speaker;
   presentation.body = req.body.body;
+  presentation.conference = req.body.conference;
   presentation.save(function(err){
     // console.log(err);
   });
@@ -304,6 +305,7 @@ app.post('/p/mgt/:id', function(req, res){
       p.title = req.body.title;
       p.speaker = req.body.speaker;
       p.body = req.body.body;
+	  p.conference = req.body.conference;
       p.save(function(err) {
         if (err)
           console.log('error')
@@ -335,7 +337,6 @@ app.get('/p/delrm/:id', function(req, res){
 });
 
 app.get('/listset/:conf', function(req, res){
-	console.log(req.params.conf);
 	var confName = req.params.conf;
 	Presentations.find(function(err, data){
 		data.forEach(function(p){
