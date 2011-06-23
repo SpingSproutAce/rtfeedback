@@ -8,11 +8,8 @@ var express = require('express'),
     models = require('./lib/models'),
     Comments = models.Comments,
     Presentations = models.Presentations,
-    uuid = require('node-uuid');
-
-/* twitter key */  
-var consumerKey = 'xzTk6lhfICMywhAWeJwfwA';
-var consumerSecret = 'iX5hriP5Q3N7rgOHnO92p9hpqLpmi3CZ8srvQaOtrEE';
+    uuid = require('node-uuid'),
+    oAuth= require('oauth').OAuth;;
 
 var app = module.exports = express.createServer();
 var socket = io.listen(app);
@@ -40,7 +37,38 @@ var isEmptyObject = function(obj){
   }
   return true;
 };
+var getTwitterLoginUrl = function(){
+  var oa= new oAuth("https://api.twitter.com/oauth/request_token",
+                    "https://api.twitter.com/oauth/access_token",
+                    "xzTk6lhfICMywhAWeJwfwA",
+                    "iX5hriP5Q3N7rgOHnO92p9hpqLpmi3CZ8srvQaOtrEE",
+                    "1.0",
+                    null,
+                    "HMAC-SHA1");
 
+  oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
+    if(error){
+      console.log(error);
+    } 
+    else { 
+      console.log('oauth_token :' + oauth_token);
+      console.log('oauth_token_secret :' + oauth_token_secret);
+      console.log(results);
+      console.log("Requesting access token");
+      oa.getOAuthAccessToken(oauth_token, oauth_token_secret, function(error, oauth_access_token, oauth_access_token_secret, results2) {
+        console.log('oauth_access_token :' + oauth_access_token);
+        console.log('oauth_token_secret :' + oauth_access_token_secret);
+        console.log(results2);
+        console.log("Requesting access token");
+
+        var data= "";
+        oa.getProtectedResource("http://term.ie/oauth/example/echo_api.php?foo=bar&too=roo", "GET", oauth_access_token,     oauth_access_token_secret,  function (error, data, response) {
+            sys.puts(data);
+        });
+      });
+    }
+  });
+};
 // HashMap
 var HashMap = function(){   
     this.map = {};
@@ -168,6 +196,7 @@ socket.on('connection', function(client){
 
 // Routes
 app.get('/', function(req, res){
+  getTwitterLoginUrl();
   if(!isEmptyObject(req.session.user)) {
     res.redirect('list');
   } else {
