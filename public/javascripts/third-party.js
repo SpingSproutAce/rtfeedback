@@ -23,7 +23,7 @@ $(function(){
       if (response.session) {
         FB.api('/me', function(response) {
           if(response){
-            console.log(response);
+            // console.log(response);
             $('#loginForm').append($('<input />', {name:'uname',value:response.name,type:"hidden"}))
                            .append($('<input />', {name:'uid',value:response.id,type:"hidden"}))
                            .append($('<input />', {name:'uImg',value:'https://graph.facebook.com/'+response.id+'/picture',type:"hidden"}))
