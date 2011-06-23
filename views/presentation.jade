@@ -6,7 +6,7 @@ script(type='text/javascript')
       window.console = {log : function(msg){}};
     }
     var valOf = {
-          uname : '#{username}',
+          uname : '#{uname}',
           port  : #{port},
           pId   : '#{p_id}',
           good  : 'Good',
@@ -296,7 +296,7 @@ script(type='text/javascript')
 div.container.presentation
   div#titleBar
     a(href="/list", class="button") return -1;
-    h4 #{username}, Let's react to #{title}
+    h4 #{uname}, Let's react to #{title}
   ul.emotionCnt.clearfix
     li.first-child
       em(data-emotion="*") #{allCnt} 

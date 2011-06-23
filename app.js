@@ -7,7 +7,8 @@ var express = require('express'),
   io = require('socket.io'),
   models = require('./lib/models'),
   Comments = models.Comments,
-  Presentations = models.Presentations;
+  Presentations = models.Presentations,
+  uuid = require('node-uuid');
   
 
 var app = module.exports = express.createServer();
@@ -16,6 +17,27 @@ var socket = io.listen(app);
 var host=process.env.VCAP_APP_HOST || 'localhost';
 var port=process.env.VCAP_APP_PORT || 11000;
 var pageSize = 25;
+var authorization = function(req,res,next){
+  if(!isEmptyObject(req.session.user)){
+    next();
+  }else{
+    res.redirect('/');
+  }
+};
+var hasRole = function(req,res,next){
+  if(req.session.user.isAdmin){
+    next();
+  }else{
+    res.redirect('/');
+  }  
+};
+var isEmptyObject = function(obj){
+  for ( var name in obj ) {
+    return false;
+  }
+  return true;
+};
+
 // HashMap
 var HashMap = function(){   
     this.map = {};
@@ -64,10 +86,7 @@ HashMap.prototype = {
       }
     },
     isEmpty : function(){
-      for ( var name in this.map ) {
-        return false;
-      }
-      return true;
+      return isEmptyObject(this.map);
     }
 };
 // Configuration
@@ -146,32 +165,39 @@ socket.on('connection', function(client){
 
 // Routes
 app.get('/', function(req, res){
-  if(req.session.username) {
+  if(!isEmptyObject(req.session.user)) {
     res.redirect('list');
   } else {
-    res.render('index');
+    req.session.token = uuid();
+    req.session.user  = {};
+    res.render('index',{'token':req.session.token});
   }
 });
 
 app.post('/login', function(req, res){
-  var username = req.body.username;  
-  if(!username){
-    res.render('index', {'error':'입력해주시옵소서...'});
-  } else {
-    req.session.username = username;
+  if(isEmptyObject(req.session.user) && (req.session.token === req.session.token) && req.body.uname ){
+    req.session.user = {
+      uname : req.body.uname,
+      uid   : req.body.uid,
+      uImg  : req.body.uImg,
+      uType : req.body.uType,
+      isAdmin : false
+    };
     res.redirect('list');
+  } else {
+    res.redirect('/');
   }
 });
+app.post('/logout', authorization,function(req, res){
+  req.session.user = {};
+});
 
-app.get('/list', function(req, res){
-  if(!req.session.username) {
-    res.redirect('/');    
-  } else {
-    // get the presentation list
-    Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
-      res.render('list', {'username':req.session.username, 'result':result});
-    });
-  }
+app.get('/list', authorization,function(req, res){
+  console.log(req.session.user);
+  // get the presentation list
+  Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
+    res.render('list', {'uname':req.session.user.uname, 'result':result});
+  });
 });
 
 app.get('/comments', function(req, res){
@@ -185,69 +211,65 @@ app.get('/comments', function(req, res){
   });
 });
 
-app.get('/p/:id', function(req, res){
-  if(!req.session.username) {
-    res.redirect('/');    
-  } else {
-    var params = {'port':port, 
-                  'username':req.session.username, 
-                  'p_id':req.params.id, 
-                  'title':'',
-                  'ngCnt'   : 0,
-                  'goodCnt' : 0, 
-                  'askCnt'  : 0, 
-                  'allCnt'  : 0,
-                  'userCnt' : 0,
-                  'ngPageCnt'   : 0,
-                  'goodPageCnt' : 0, 
-                  'askPageCnt'  : 0, 
-                  'allPageCnt'  : 0,
-                  'allUserCnt'  : 0,
-                  'allUsers'    :''
-                 },
-      presentFn = function(){
-        Presentations.findById(req.params.id, function(err, p){
-          if(!p){
-            res.redirect('/list');
-          } else {
-            var _clientMap = channelMap.get(req.params.id);
-            params['userCnt'] = (_clientMap && !_clientMap.isEmpty() && _clientMap.size()||1)||1;
-            params.title = p.title;
-            params.serverTime = (+new Date());
-            res.render('presentation',params);
-          }
-        });
-      },
-      countFn = function(args){
-        var arg = args[idx++],
-          param = {'to':params.p_id};
-        if(arg.emotion){
-          param.emotion = arg.emotion;
+app.get('/p/:id', authorization, function(req, res){
+  var params = {'port':port, 
+                'uname':req.session.user.uname, 
+                'p_id':req.params.id, 
+                'title':'',
+                'ngCnt'   : 0,
+                'goodCnt' : 0, 
+                'askCnt'  : 0, 
+                'allCnt'  : 0,
+                'userCnt' : 0,
+                'ngPageCnt'   : 0,
+                'goodPageCnt' : 0, 
+                'askPageCnt'  : 0, 
+                'allPageCnt'  : 0,
+                'allUserCnt'  : 0,
+                'allUsers'    :''
+               },
+    presentFn = function(){
+      Presentations.findById(req.params.id, function(err, p){
+        if(!p){
+          res.redirect('/list');
+        } else {
+          var _clientMap = channelMap.get(req.params.id);
+          params['userCnt'] = (_clientMap && !_clientMap.isEmpty() && _clientMap.size()||1)||1;
+          params.title = p.title;
+          params.serverTime = (+new Date());
+          res.render('presentation',params);
         }
-        Comments.find(param).count(function(err, count){
-          params[arg.countNm+'Cnt'] = count;
-          params[arg.countNm+'PageCnt'] = Math.ceil((count-pageSize)/pageSize);
-          arg.callBack.call(this,args);
-        });
-      },
-      countUserFn = function(args){
-	    var arg = args[idx++]
-		,param = {'to':params.p_id};
+      });
+    },
+    countFn = function(args){
+      var arg = args[idx++],
+        param = {'to':params.p_id};
+      if(arg.emotion){
+        param.emotion = arg.emotion;
+      }
+      Comments.find(param).count(function(err, count){
+        params[arg.countNm+'Cnt'] = count;
+        params[arg.countNm+'PageCnt'] = Math.ceil((count-pageSize)/pageSize);
+        arg.callBack.call(this,args);
+      });
+    },
+    countUserFn = function(args){
+    var arg = args[idx++],
+  		  param = {'to':params.p_id};
 		Comments.collection.distinct('from', param, function(err, data){
 		  params['allUsers'] = data;
 		  params['allUsersCnt'] = data.length;
 		  arg.callBack.call(this,args);
 		});
-	  },
-      functions  = [{'callBack':countFn},
-              {'emotion' : '!Good', 'countNm' : 'ng', 'callBack' :countFn},
-              {'emotion' : 'Good', 'countNm' : 'good', 'callBack' :countFn},
-              {'emotion' : 'Ask', 'countNm' : 'ask', 'callBack' :countFn},
-              {'countNm' : 'all', 'callBack' :presentFn}
-             ],
-      idx = 0;
-      countUserFn(functions);
-  }
+  },
+  functions  = [{'callBack':countFn},
+                {'emotion' : '!Good', 'countNm' : 'ng', 'callBack' :countFn},
+                {'emotion' : 'Good', 'countNm' : 'good', 'callBack' :countFn},
+                {'emotion' : 'Ask', 'countNm' : 'ask', 'callBack' :countFn},
+                {'countNm' : 'all', 'callBack' :presentFn}
+               ],
+  idx = 0;
+  countUserFn(functions);
 });
 
 app.get('/list/mgt', function(req, res){

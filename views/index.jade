@@ -2,12 +2,17 @@ div.container.center.index
   div.header
     h1='The 2011 Java Developers Conference'
   div.article
-    form(method='post', action='/login')
-      h4.subheader='What\'s your name?'
-      input(type='text', name='username')
-      - if (typeof(error) != 'undefined')
-        span(class='error_msg') #{error}
-      input(type='submit', value='Go!')
+    a#fbLogin(href='#')
+      img(src='/images/sign-in-fb.png')
+    &nbsp;&nbsp;
+    a#twLogin(href='#')
+     img(src='/images/sign-in-twitter.png')
+    form#loginForm(method='post', action='/login')
+      input(type='hidden', value=token, name='token')
   div.footer
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout
+  div#fb-root
+script(src='/javascripts/jquery-1.6.1.min.js')
+script(src='http://connect.facebook.net/en_US/all.js')
+script(src='/javascripts/fb.js')
