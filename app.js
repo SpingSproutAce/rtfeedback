@@ -6,7 +6,6 @@ const confName = 'sdec';
 var express = require('express'),
     io = require('socket.io'),
     models = require('./lib/models'),
-    oauth = require('oauth-client/lib/oauth'),
     Comments = models.Comments,
     Presentations = models.Presentations,
     uuid = require('node-uuid');
@@ -169,32 +168,6 @@ socket.on('connection', function(client){
 
 // Routes
 app.get('/', function(req, res){
-  /*  
-  console.log(oauth);
-  var client = oauth.createClient(443,'api.twitter.com',true);
-  //oauth setup
-  var consumer = oauth.createConsumer(consumerKey,consumerSecret);
-  var token = oauth.createToken();
-  var signer = oauth.createHmac(consumer);
-
-  //endpoints
-  var requestTokenUrl = '/oauth/request_token';
-  var accessTokenUrl = '/oauth/access_token';
-  var authorizeTokenUrl = '/oauth/authorize';
-
-  var data = '';
-  var tokenData = '';
-
-  var requestToken = client.request('POST',requestTokenUrl,null,null,signer);
-  requestToken.end();
-
-  requestToken.addListener('response', function (response) {
-	 response.addListener('data', function (chunk) {	data+=chunk });
-  	response.addListener('end', onRequestTokenResponse);
-  });
-  */ 
-  
-  
   if(!isEmptyObject(req.session.user)) {
     res.redirect('list');
   } else {
