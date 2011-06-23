@@ -385,8 +385,11 @@ app.get('/listset/:conf', function(req, res){
 app.get('/m', function(req, res){
 	Comments.find(function(err, data){
 		data.forEach(function(c){
-			c.user.name = c.from;
-			c.save();
+			if(!c.user) {
+				c.user.name = c.from;
+				c.user.avatar = 'https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif';
+				c.save();
+			}
 		})
 	});
 });
