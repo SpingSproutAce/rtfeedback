@@ -61,10 +61,6 @@ var getTwitterLoginUrl = function(){
         console.log(results2);
         console.log("Requesting access token");
 
-        var data= "";
-        oa.getProtectedResource("http://term.ie/oauth/example/echo_api.php?foo=bar&too=roo", "GET", oauth_access_token,     oauth_access_token_secret,  function (error, data, response) {
-            sys.puts(data);
-        });
       });
     }
   });
