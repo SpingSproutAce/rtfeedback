@@ -251,7 +251,7 @@ app.get('/p/:id', function(req, res){
 });
 
 app.get('/list/mgt', function(req, res){
-  Presentations.find().sort('body', 1).execFind(function(err, result){
+  Presentations.find().sort('conference',1).sort('body', 1).execFind(function(err, result){
     res.render("list-mgt", {'result':result});
   });
 });
