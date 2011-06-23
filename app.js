@@ -387,8 +387,10 @@ app.get('/m', function(req, res){
 				c.user.name = c.from;
 				c.user.avatar = 'https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif';
 				c.save();
+				console.log(c.user.name);
 			}
-		})
+		});
+		req.redirect("/list");
 	});
 });
 
