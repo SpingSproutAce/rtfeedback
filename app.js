@@ -9,7 +9,6 @@ var express = require('express'),
   Comments = models.Comments,
   Presentations = models.Presentations,
   uuid = require('node-uuid');
-  
 
 var app = module.exports = express.createServer();
 var socket = io.listen(app);
@@ -17,7 +16,7 @@ var socket = io.listen(app);
 var host=process.env.VCAP_APP_HOST || 'localhost';
 var port=process.env.VCAP_APP_PORT || 11000;
 var pageSize = 25;
-var authorization = function(req,res,next){
+var authentication = function(req,res,next){
   if(!isEmptyObject(req.session.user)){
     next();
   }else{
@@ -188,12 +187,12 @@ app.post('/login', function(req, res){
     res.redirect('/');
   }
 });
-app.get('/logout', authorization,function(req, res){
+app.get('/logout', authentication,function(req, res){
   req.session.user = {};
   res.redirect('/');
 });
 
-app.get('/list', authorization,function(req, res){
+app.get('/list', authentication,function(req, res){
   // get the presentation list
   Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
     res.render('list', {'uname':req.session.user.uname, 'result':result});
@@ -211,7 +210,7 @@ app.get('/comments', function(req, res){
   });
 });
 
-app.get('/p/:id', authorization, function(req, res){
+app.get('/p/:id', authentication, function(req, res){
   var params = {'port':port, 
                 'uname':req.session.user.uname, 
                 'p_id':req.params.id, 
