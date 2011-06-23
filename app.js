@@ -188,12 +188,12 @@ app.post('/login', function(req, res){
     res.redirect('/');
   }
 });
-app.post('/logout', authorization,function(req, res){
+app.get('/logout', authorization,function(req, res){
   req.session.user = {};
+  res.redirect('/');
 });
 
 app.get('/list', authorization,function(req, res){
-  console.log(req.session.user);
   // get the presentation list
   Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
     res.render('list', {'uname':req.session.user.uname, 'result':result});

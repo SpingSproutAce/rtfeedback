@@ -317,6 +317,9 @@ div#input_bar input#comment{
 div.footer{
   text-align:center;
 }
+div.footer a.logout{
+  color:#0059A0;
+}
 ul.tabs li strong{
   font-size:16px;
 }
