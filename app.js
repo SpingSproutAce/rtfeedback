@@ -146,12 +146,14 @@ socket.on('connection', function(client){
       // save
       var newComments = new Comments();
       newComments.to = channel;
-      newComments.from = msg.from;
+      newComments.user.name = msg.user.name;
+      newComments.user.avatar = msg.user.avatar;
+      // newComments.from = msg.from;
       newComments.body = msg.body;
       newComments.emotion = msg.emotion;
       newComments.date = (+new Date());
       newComments.save(function(err){
-        //console.log(err);
+        // console.log(err);
       });
       // publish
       var clients = channelMap.get(channel).getAll();
@@ -236,14 +238,15 @@ app.get('/comments', function(req, res){
      req.query.date = {$lt: req.query.date};
   }
 
-  Comments.find(req.query, ['emotion','body','date','from']).sort('date', -1).limit(pageSize).execFind( function(err, docs) {
+  Comments.find(req.query, ['emotion','body','date','user']).sort('date', -1).limit(pageSize).execFind( function(err, docs) {
     res.send(docs);
   });
 });
 
 app.get('/p/:id', authentication, function(req, res){
   var params = {'port':port, 
-                'uname':req.session.user.uname, 
+                'uname':req.session.user.uname,
+                'avatar':req.session.user.uImg,
                 'p_id':req.params.id, 
                 'title':'',
                 'ngCnt'   : 0,
@@ -286,7 +289,7 @@ app.get('/p/:id', authentication, function(req, res){
     countUserFn = function(args){
     var arg = args[idx++],
   		  param = {'to':params.p_id};
-		Comments.collection.distinct('from', param, function(err, data){
+		Comments.collection.distinct('user', param, function(err, data){
 		  params['allUsers'] = data;
 		  params['allUsersCnt'] = data.length;
 		  arg.callBack.call(this,args);
@@ -377,6 +380,15 @@ app.get('/listset/:conf', function(req, res){
 		})
 	});
 	res.redirect("/list");
+});
+
+app.get('/m', function(req, res){
+	Comments.find(function(err, data){
+		data.forEach(function(c){
+			c.user.name = c.from;
+			c.save();
+		})
+	});
 });
 
 app.get('twitter_callback',function(req,res){

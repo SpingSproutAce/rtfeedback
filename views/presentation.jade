@@ -7,6 +7,7 @@ script(type='text/javascript')
     }
     var valOf = {
           uname : '#{uname}',
+          avatar: '#{avatar}',
           port  : #{port},
           pId   : '#{p_id}',
           good  : 'Good',
@@ -25,12 +26,14 @@ script(type='text/javascript')
                       '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.png"/></div> '+
                       '  <div class="comment-body"> '+
                       '   <p>{{body}}</p> '+
-                      '   <small>by <em>{{from}}</em> on <time data-timestamp="{{date}}">{{timeString}}</time></small> '+
+                      '   <small>by <em>{{user.name}}</em> <img src="{{user.avatar}}" height="15" width="15" /> on <time data-timestamp="{{date}}">{{timeString}}</time></small> '+
                       '  </div> '+
                       '</li>';
     /* Below there are functions */
     var compileTempl = function(data){
       var templ = commentBox;
+      templ = templ.replace(new RegExp("\\{\\{user.name\\}\\}","gi"), data.user.name);
+      templ = templ.replace(new RegExp("\\{\\{user.avatar\\}\\}","gi"), data.user.avatar);
       $.each(data,function(key,value){
         templ = templ.replace(new RegExp("\\{\\{" + key + "\\}\\}","gi"),value);
       });
@@ -212,7 +215,7 @@ script(type='text/javascript')
       var msg = {
             'body'    : $.trim($('#comment').val()),
             'emotion' : currentEmotion(),
-            'from'    : valOf.uname
+            'user'    : {'name': valOf.uname, 'avatar': valOf.avatar}
           };
       if(!msg.body) {
         return false;
@@ -313,10 +316,14 @@ div.container.presentation
     li.last-child
       em(data-emotion="Users") #{userCnt}
       label Users
-  p By #{allUsersCnt} Users:
-  ul.users
-    - each u in allUsers
-      li #{u}
+  div#allUsers
+    p By #{allUsersCnt} Users
+    ul
+      - each u in allUsers
+        li 
+          - var avatar = u.avatar
+          - var name = u.name
+          img(src=avatar, title=name, height='24', width='24')
   ul.tabs
     li  
       a(href="/comments/",class="active", data-emotion="*") 

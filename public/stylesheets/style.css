@@ -363,4 +363,16 @@ ul.list{
   list-style: disc outside none;
   text-align: left;
 }
+div#allUsers p {
+	margin:0 0 10px;
+}
+div#allUsers ul{
+	width:100%;
+}
+div#allUsers ul li{
+	float:left;
+	line-height: 0px;
+	margin-bottom:10px;
+	margin-right:3px;
+}
 
