@@ -390,7 +390,7 @@ app.get('/m', function(req, res){
 				console.log(c.user.name);
 			}
 		});
-		req.redirect("/list");
+		res.redirect("/list");
 	});
 });
 
