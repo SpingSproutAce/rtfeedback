@@ -33,7 +33,6 @@ var authorization = function(req,res,next){
     res.redirect('/');
   }  
 };
-
 // Configuration
 app.configure(function(){
   app.set('views', __dirname + '/views');
@@ -127,11 +126,8 @@ app.post('/login', function(req, res){
     res.redirect('/');
   }
 });
-<<<<<<< HEAD
-app.get('/logout',function(req, res){
-=======
+
 app.get('/logout', authentication,function(req, res){
->>>>>>> twitter-oauth
   ss2.clearUser(req,res);
   res.redirect('/');
 });
@@ -291,6 +287,7 @@ app.get('/listset/:conf', function(req, res){
 	});
 	res.redirect("/list");
 });
+
 
 app.get('/m', function(req, res){
 	Comments.find(function(err, data){
