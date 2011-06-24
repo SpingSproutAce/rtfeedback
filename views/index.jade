@@ -5,7 +5,7 @@ div.container.center.index
     a#fbLogin(href='#')
       img(src='/images/sign-in-fb.png')
     &nbsp;&nbsp;
-    a#twLogin(href='#')
+    a#twLogin(href=twitterLoginUrl)
      img(src='/images/sign-in-twitter.png')
     form#loginForm(method='post', action='/login')
       input(type='hidden', value=token, name='token')

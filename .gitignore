@@ -1,3 +1,4 @@
 *.out
 .monitor
 .DS_Store
+*.log

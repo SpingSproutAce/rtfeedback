@@ -8,8 +8,8 @@ var express = require('express'),
     models = require('./lib/models'),
     Comments = models.Comments,
     Presentations = models.Presentations,
-    uuid = require('node-uuid'),
-    oAuth= require('oauth').OAuth;;
+    uuid = require('node-uuid'),    
+    ss2  = require('./lib/ss2');
 
 var app = module.exports = express.createServer();
 var socket = io.listen(app);
@@ -17,107 +17,24 @@ var socket = io.listen(app);
 var host=process.env.VCAP_APP_HOST || 'localhost';
 var port=process.env.VCAP_APP_PORT || 11000;
 var pageSize = 25;
+
+                      
 var authentication = function(req,res,next){
-  if(!isEmptyObject(req.session.user)){
+  if(ss2.isLogin(req)){
     next();
   }else{
     res.redirect('/');
   }
 };
-var hasRole = function(req,res,next){
-  if(req.session.user.isAdmin){
+var authorization = function(req,res,next){
+  if(ss2.isAdmin(req)){
     next();
   }else{
     res.redirect('/');
   }  
 };
-var isEmptyObject = function(obj){
-  for ( var name in obj ) {
-    return false;
-  }
-  return true;
-};
-var getTwitterLoginUrl = function(){
-  var oa= new oAuth("https://api.twitter.com/oauth/request_token",
-                    "https://api.twitter.com/oauth/access_token",
-                    "xzTk6lhfICMywhAWeJwfwA",
-                    "iX5hriP5Q3N7rgOHnO92p9hpqLpmi3CZ8srvQaOtrEE",
-                    "1.0",
-                    null,
-                    "HMAC-SHA1");
 
-  oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
-    if(error){
-      console.log(error);
-    } 
-    else { 
-      console.log('oauth_token :' + oauth_token);
-      console.log('oauth_token_secret :' + oauth_token_secret);
-      console.log(results);
-      console.log("Requesting access token");
-      oa.getOAuthAccessToken(oauth_token, oauth_token_secret, function(error, oauth_access_token, oauth_access_token_secret, results2) {
-        console.log('oauth_access_token :' + oauth_access_token);
-        console.log('oauth_token_secret :' + oauth_access_token_secret);
-        console.log(results2);
-        console.log("Requesting access token");
-
-      });
-    }
-  });
-};
-// HashMap
-var HashMap = function(){   
-    this.map = {};
-    this._length = 0;
-};   
-HashMap.prototype = {
-    size : function(isPlus){
-      if(isPlus === undefined){
-        return this._length;
-      }
-      if(isPlus){
-        this._length += 1;
-      }else{
-        if(this._length){
-          this._length -= 1;
-        }
-      }
-      return this;
-    },
-    put : function(key, value){   
-        this.size(true).map[key]= value;
-    },   
-    get : function(key){   
-        return this.map[key];
-    },   
-    getAll : function(){   
-        return this.map;
-    },   
-    clear : function(){   
-        this.map = new Object();
-    },   
-    getKeys : function(){   
-        var keys = new Array();   
-        for(i in this.map){   
-            keys.push(i);
-        }   
-        return keys;
-    },
-    hasKey : function(key){
-      return (this.get(key) !== undefined);
-    },
-    remove : function(key){
-      if(this.hasKey(key)){
-        delete this.map[key];
-        this.size(false);
-      }
-    },
-    isEmpty : function(){
-      return isEmptyObject(this.map);
-    }
-};
 // Configuration
-
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
@@ -139,8 +56,8 @@ app.configure('production', function(){
 
 // Socket IO
 
-var channelMap = new HashMap();
-var clientKeyMap  = new HashMap();
+var channelMap = ss2.createHashMap();
+var clientKeyMap  = ss2.createHashMap();
 var removeClient = function(channalId,sessionId){
   var _clentMap = channelMap.get(channalId||'');
   _clentMap && !_clentMap.isEmpty() && _clentMap.remove(sessionId||'');
@@ -154,7 +71,7 @@ socket.on('connection', function(client){
     var clientMap = channelMap.get(channel);    
     if(action === 'subscribe'){
       if(clientMap === undefined) {
-        clientMap = new HashMap();
+        clientMap = ss2.createHashMap();
         channelMap.put(channel, clientMap);
       } 
       if(message.sessionId){ 
@@ -193,40 +110,32 @@ socket.on('connection', function(client){
 });
 
 // Routes
-app.get('/', function(req, res){
-  getTwitterLoginUrl();
-  if(!isEmptyObject(req.session.user)) {
+app.get('/',ss2.restoreUserFromCookie,ss2.getTwitterLoginUrl, function(req, res){
+  if(ss2.isLogin(req)) {
     res.redirect('list');
   } else {
     req.session.token = uuid();
-    req.session.user  = {};
-    res.render('index',{'token':req.session.token});
+    res.render('index',{'token':req.session.token,'twitterLoginUrl':(req.session.twitter.twitterLoginUrl||'#')});
   }
 });
 
 app.post('/login', function(req, res){
-  if(isEmptyObject(req.session.user) && (req.session.token === req.session.token) && req.body.uname ){
-    req.session.user = {
-      uname : req.body.uname,
-      uid   : req.body.uid,
-      uImg  : req.body.uImg,
-      uType : req.body.uType,
-      isAdmin : false
-    };
+  if(!ss2.isLogin(req) && (req.session.token === req.session.token) && req.body.uname ){
+    ss2.clearUser(req,res).saveUser(req,res, req.body);
     res.redirect('list');
   } else {
     res.redirect('/');
   }
 });
-app.get('/logout', authentication,function(req, res){
-  req.session.user = {};
+app.get('/logout',function(req, res){
+  ss2.clearUser(req,res);
   res.redirect('/');
 });
 
 app.get('/list', authentication,function(req, res){
   // get the presentation list
   Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
-    res.render('list', {'uname':req.session.user.uname, 'result':result});
+    res.render('list', {'uname':ss2.getUname(req), 'result':result});
   });
 });
 
@@ -243,8 +152,8 @@ app.get('/comments', function(req, res){
 
 app.get('/p/:id', authentication, function(req, res){
   var params = {'port':port, 
-                'uname':req.session.user.uname,
-                'avatar':req.session.user.uImg,
+                'uname':ss2.getUname(req), 
+                'avatar':ss2.getAvatar(req),
                 'p_id':req.params.id, 
                 'title':'',
                 'ngCnt'   : 0,
@@ -310,7 +219,6 @@ app.get('/list/mgt', function(req, res){
 });
 
 app.post('/list/add', function(req, res){
-  console.log(req.body);
   var presentation = new Presentations();
   presentation.title = req.body.title;
   presentation.speaker = req.body.speaker;
@@ -380,6 +288,7 @@ app.get('/listset/:conf', function(req, res){
 	res.redirect("/list");
 });
 
+
 app.get('/m', function(req, res){
 	Comments.find(function(err, data){
 		data.forEach(function(c){
@@ -394,7 +303,17 @@ app.get('/m', function(req, res){
 	});
 });
 
-app.get('twitter_callback',function(req,res){
+app.get('/twitter_callback',function(req,res){
+  req.session.twitterLoginUrl = undefined;
+  if(req.query.denied){
+    res.render("twitter-callback",{layout:false,'isSuccess':false});  
+  }else{
+    oAuth.getOAuthAccessToken(req.query.oauth_token,null,req.query.oauth_verifier,function(error, oauth_access_token,oauth_access_token_secret, results){
+      //console.log('oauth_access_token'+oauth_access_token);
+      //console.log('oauth_access_token_secret'+oauth_access_token_secret);
+      res.render("twitter-callback",{layout:false,'isSuccess':true});  
+    });
+  }
 });
 app.listen(port);
 console.log("Express server listening on port %d", app.address().port);
