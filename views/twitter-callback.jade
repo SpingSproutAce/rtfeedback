@@ -1,0 +1,14 @@
+script(type='text/javascript')
+  (function(){
+    try{
+      var isSuccess = #{isSuccess};
+      if(isSuccess){
+        window.opener.location.replace('/list');      
+      }else{
+        window.opener.window.opener.location.reload(true);
+      }
+      self.close();
+    }catch(e){
+      self.close();
+    }
+  })();

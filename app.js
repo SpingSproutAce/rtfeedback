@@ -304,14 +304,13 @@ app.get('/m', function(req, res){
 });
 
 app.get('/twitter_callback',function(req,res){
-  req.session.twitterLoginUrl = undefined;
+  req.session.twitter={};
+  var renderFn = function(isSuccess){res.render("twitter-callback",{layout:false,'isSuccess':isSuccess});};
   if(req.query.denied){
-    res.render("twitter-callback",{layout:false,'isSuccess':false});  
+    renderFn(false);        
   }else{
-    oAuth.getOAuthAccessToken(req.query.oauth_token,null,req.query.oauth_verifier,function(error, oauth_access_token,oauth_access_token_secret, results){
-      //console.log('oauth_access_token'+oauth_access_token);
-      //console.log('oauth_access_token_secret'+oauth_access_token_secret);
-      res.render("twitter-callback",{layout:false,'isSuccess':true});  
+    ss2.getTwitterUserInfo(req,res,function(isSuccess){
+      renderFn(isSuccess);        
     });
   }
 });
