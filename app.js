@@ -8,6 +8,7 @@ var express = require('express'),
     models = require('./lib/models'),
     Comments = models.Comments,
     Presentations = models.Presentations,
+    Users = models.Users,
     uuid = require('node-uuid'),    
     ss2  = require('./lib/ss2');
 
