@@ -26,16 +26,18 @@ script(type='text/javascript')
                       '  <div class="emotion"><img width="50px" height="50px" src="/images/{{imgFileNm}}.png"/></div> '+
                       '  <div class="comment-body"> '+
                       '   <p>{{body}}</p> '+
-                      '   <small>by <em>{{user.name}}</em> <img src="{{user.avatar}}" height="15" width="15" /> on <time data-timestamp="{{date}}">{{timeString}}</time></small> '+
+                      '   <small>by <em>{{name}}</em> <img src="{{avatar}}" height="15" width="15" /> on <time data-timestamp="{{date}}">{{timeString}}</time></small> '+
                       '  </div> '+
                       '</li>';
     /* Below there are functions */
     var compileTempl = function(data){
       var templ = commentBox;
-      templ = templ.replace(new RegExp("\\{\\{user.name\\}\\}","gi"), data.user.name);
-      templ = templ.replace(new RegExp("\\{\\{user.avatar\\}\\}","gi"), data.user.avatar);
       $.each(data,function(key,value){
-        templ = templ.replace(new RegExp("\\{\\{" + key + "\\}\\}","gi"),value);
+        if(typeof value === 'object'){
+          templ = compileTempl(value);
+        }else{
+          templ = templ.replace(new RegExp("\\{\\{" + key + "\\}\\}","gi"),value);
+        }
       });
       return templ;
     },

@@ -26,7 +26,7 @@ $(function(){
             // console.log(response);
             $('#loginForm').append($('<input />', {name:'uname',value:response.name,type:"hidden"}))
                            .append($('<input />', {name:'uid',value:response.id,type:"hidden"}))
-                           .append($('<input />', {name:'uImg',value:'https://graph.facebook.com/'+response.id+'/picture',type:"hidden"}))
+                           .append($('<input />', {name:'avatar',value:'https://graph.facebook.com/'+response.id+'/picture',type:"hidden"}))
                            .append($('<input />', {name:'uType',value:'facebook',type:"hidden"})).submit();
           }
         });
