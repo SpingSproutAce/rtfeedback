@@ -375,4 +375,8 @@ div#allUsers ul li{
 	margin-bottom:10px;
 	margin-right:3px;
 }
-
+div#allUsers p span{
+  font:1.5em "HelveticaNeue","HelveticaNeue",Arial;
+  color: #666;
+  margin-right: 3px;	
+}
