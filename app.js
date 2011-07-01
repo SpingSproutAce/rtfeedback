@@ -342,7 +342,6 @@ app.get('/m', authorization, function(req, res){
 				c.user.name = c.from;
 				c.user.avatar = 'https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif';
 				c.save();
-				console.log(c.user.name);
 			}
 		});
 		res.redirect("/list");
@@ -366,7 +365,7 @@ app.get('/admin/:text', function(req, res){
 	if(textParam === 'md5'){
 		// ss2.updateUser(req, {isAdmin:true});
 		var user = ss2.getUser(req);
-        console.log(user);
+        // console.log(user);
         user.isAdmin = true;
         req.session.user = user;
 	}
