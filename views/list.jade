@@ -1,12 +1,17 @@
 div.container.center
   div.header
-    h1='The SDEC 2011\'s Schedules'
+    h1 The 
+       | #{confTitle}
+       | '\s Schedules
   div.article
     ul.list
       - each p in result
         - var link = '/p/' + p._id
         li
           a(href=link)  #{p.body} | #{p.speaker} | #{p.title}
+    button(id='prev_list') prev();
+    button(id='curr_list') current();
+    button(id='next_list') next();
   div.footer
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout
@@ -20,6 +25,18 @@ script(type='text/javascript')
       var url = $(this).attr('href');
       var title = $(this).text();
       document.location.href = url;
+      return false;
+    });
+    $('#prev_list').click(function(){
+      document.location.href = '/prev';
+      return false;
+    });
+    $('#next_list').click(function(){
+      document.location.href = '/next';
+      return false;
+    });
+    $('#curr_list').click(function(){
+      document.location.href = '/curr';
       return false;
     });
   });    

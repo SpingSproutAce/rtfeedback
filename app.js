@@ -1,7 +1,11 @@
 /**
  * Module dependencies.
  */
-const confName = 'sdec';
+var confName = 'test'
+	, confTitle = 'Live.log Test'
+	, histories = [{'name':'test', 'title':'Live.log Test'}
+					, {'name':'sdec', 'title':'SDEC 2011'}
+					, {'name':'jco', 'title':'JCO 2011'}];
 
 var express = require('express'),
     io = require('socket.io'),
@@ -135,9 +139,51 @@ app.get('/logout', authentication,function(req, res){
 app.get('/list', authentication,function(req, res){
   // get the presentation list
   Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
-    res.render('list', {'uname':ss2.getUname(req), 'result':result});
+    res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':confTitle, 'histories':histories});
   });
 });
+
+var getCurrentConfIndex = function(){
+  var currentConfIndex = 0;
+  histories.forEach(function(conf, index){
+    if(conf.name === confName){
+      currentConfIndex = index;
+    }
+  });
+  return currentConfIndex;
+}
+
+app.get('/next', authentication, function(req, res){
+  var conf = '', currentConfIndex = getCurrentConfIndex();
+  if(currentConfIndex !== histories.length-1) {
+    conf = histories[++currentConfIndex];
+  } else {
+    conf = histories[0];
+  }
+  confName = conf.name;
+  confTitle = conf.title;
+  res.redirect("/list");
+});
+
+app.get('/prev', authentication, function(req, res){
+  var conf = '', currentConfIndex = getCurrentConfIndex();
+  if(currentConfIndex !== 0) {
+    conf = histories[--currentConfIndex];
+  } else {
+    conf = histories[histories.length-1];
+  }
+  confName = conf.name;
+  confTitle = conf.title;
+  res.redirect("/list");
+});
+
+app.get('/curr', authentication, function(req, res){
+  var conf = histories[0];
+  confName = conf.name;
+  confTitle = conf.title;
+  res.redirect("/list");	
+});
+
 
 app.get('/comments', function(req, res){
   res.contentType('application/json');
@@ -318,7 +364,11 @@ app.get('/twitter_callback',function(req,res){
 app.get('/admin/:text', function(req, res){
 	var textParam = req.params.text;
 	if(textParam === 'md5'){
-		ss2.updateUser(req, {isAdmin:true});
+		// ss2.updateUser(req, {isAdmin:true});
+		var user = ss2.getUser(req);
+        console.log(user);
+        user.isAdmin = true;
+        req.session.user = user;
 	}
 	res.redirect("/");
 });

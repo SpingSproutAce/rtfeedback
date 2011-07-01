@@ -16,16 +16,20 @@ div.container.center
 			label body
 				- var body = p.body
 				input(type='text',name='body',value=body)
-			input(type='submit', value='Update!')
-			button(id='delete_p') Delete!
+			input(type='submit', value='update();')
+			button(id='delete_p') delete();
+			button(id='list_mgt') list.mgt();
 	div.footer
 		a(href='http://springsprout.org') made by 봄싹
 script(src='/javascripts/jquery-1.6.1.min.js')
 script(type='text/javascript')
 	$(function(){
 		$('#delete_p').click(function(){
-			console.log("delete!!");
 			document.location.href = '/p/del/#{p._id}';
+			return false;
+		});
+		$('#list_mgt').click(function(){
+			document.location.href = '/list/mgt';
 			return false;
 		});
 	});
