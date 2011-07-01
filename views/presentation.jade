@@ -98,6 +98,22 @@ script(type='text/javascript')
       }
     },
     
+    updateAllUserCount = function(message){
+      var messageUserName = message.user.name;
+      var messageUserAvatar = message.user.avatar;
+      var isNew = true;
+      $('div#allUsers li img').each(function(index){
+        if($(this).attr('title') === messageUserName){
+          isNew = false;
+        }
+      });
+      if(isNew){
+        $('div#allUsers ul').append('<li><img src="' + messageUserAvatar + '" title="' + messageUserName + '" height="24" width="24"></li>');
+        var allUserCount = $('div#allUsers p span').text();
+        $('div#allUsers p span').text(++allUserCount);
+      }
+    },
+    
     currentEmotion = function(){
       return $('ul.tabs li > a.active').data('emotion');
     },
@@ -203,6 +219,7 @@ script(type='text/javascript')
           emotion = currentEmotion();
       message.timeString = changeTimeString(new Date().getTime(),message.date);
       updateEmotionCount(message);
+      updateAllUserCount(message);
       var newComment = compileTempl(message);
       if(emotion !== '*' && message.emotion !== '*'){
         $(emotionOf['*'].id).prepend(newComment);
@@ -319,7 +336,9 @@ div.container.presentation
       em(data-emotion="Users") #{userCnt}
       label Users
   div#allUsers
-    p By #{allUsersCnt} Users
+    p By all 
+      span #{allUsersCnt}
+      | Users
     ul
       - each u in allUsers
         li 
