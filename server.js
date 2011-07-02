@@ -8,7 +8,7 @@ var confName = 'ksug'
 					, {'name':'jco', 'title':'JCO 2011'}];
 
 var host = (process.env.VCAP_APP_HOST || 'localhost')
-  , port = (port=process.env.VCAP_APP_PORT || 11000)
+  , port = (port=process.env.VCAP_APP_PORT || 80)
   , pageSize = 25
   , express = require('express')
   , sio = require('socket.io')
