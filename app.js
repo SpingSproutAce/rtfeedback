@@ -1,9 +1,9 @@
 /**
  * Module dependencies.
  */
-var confName = 'test'
-	, confTitle = 'Live.log Test'
-	, histories = [{'name':'test', 'title':'Live.log Test'}
+var confName = 'ksug'
+	, confTitle = 'KSUG Flash Seminar'
+	, histories = [{'name':'ksug', 'title':'KSUG Flash Seminar'}
 					, {'name':'sdec', 'title':'SDEC 2011'}
 					, {'name':'jco', 'title':'JCO 2011'}];
 
