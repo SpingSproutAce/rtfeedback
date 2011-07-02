@@ -225,7 +225,7 @@ script(type='text/javascript')
       socket.on('someone is leaving '+valOf.pId, function(count){
         updateUserCount(count);
       });
-      socket.on('someone here '+valOf.pId,function(count){
+      socket.on('someone is here '+valOf.pId,function(count){
         updateUserCount(count);
       });
     });

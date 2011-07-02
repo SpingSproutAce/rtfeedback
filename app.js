@@ -90,7 +90,7 @@ io.sockets.on('connection', function(socket){
     users.put(id,1);
     var userCount = users.size();
     updatedFn(userCount);
-    socket.broadcast.emit('someone here '+socket.channelId, userCount);
+    socket.broadcast.emit('someone is here '+socket.channelId, userCount);
   });
   
   socket.on('push log', function(message,updateFn){
