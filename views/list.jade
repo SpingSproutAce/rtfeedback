@@ -1,8 +1,5 @@
 div.container.center
   div.header
-    button(id='prev_list') prev();
-    button(id='curr_list') current();
-    button(id='next_list') next();
     h1 The 
        | #{confTitle}
        | '\s Schedules
@@ -12,9 +9,6 @@ div.container.center
         - var link = '/p/' + p._id
         li
           a(href=link)  #{p.body} | #{p.speaker} | #{p.title}
-    button(id='prev_list') prev();
-    button(id='curr_list') current();
-    button(id='next_list') next();
   div.footer
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout
