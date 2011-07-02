@@ -189,33 +189,18 @@ script(type='text/javascript')
         }
       }
     },
+    
     setWindowScrollEvent = function(timeOut){
       setTimeout(function(){
         $(window).scroll(windowScrollEvent);
       },timeOut||500);
-    };
+    },
     
-    var socket = new io.Socket(null, {port: valOf.port, rememberTransport:false});
-    
-    socket.connect();
-    socket.send({'type':'subscribe', 'channel':valOf.pId});
-    socket.on('reconnect',function(){
-      socket.send({'type':'subscribe', 'channel':valOf.pId,'sessionId':sessionId});
-    });
-    socket.on('message', function(obj){
-      if(typeof obj === 'string'){
+    updateLog = function(message){
+      if(!message){
         return false;
       }
-      updateUserCount(obj.userCnt);
-      if(obj.checked){
-        sessionId = obj.sessionId;
-        return false;
-      }
-      //exception of duplication push.
-      if(sessionId !== obj.sessionId){
-        return false;
-      }
-      var message = setImageFileName(obj.msg),
+      var message = setImageFileName(message),
           emotion = currentEmotion();
       message.timeString = changeTimeString(new Date().getTime(),message.date);
       updateEmotionCount(message);
@@ -225,7 +210,26 @@ script(type='text/javascript')
         $(emotionOf['*'].id).prepend(newComment);
       }
       $(emotionOf[message.emotion].id).prepend(newComment);
+    };
+    
+    
+    //var socket = new io.Socket(null, {port: valOf.port, rememberTransport:false});
+    var socket = io.connect('http://'+document.location.host);
+    socket.on('connect',function(){
+      socket.emit('entrance',valOf.pId, function(count){
+        updateUserCount(count);
+      });  
+      socket.on('pull log '+valOf.pId, function (data) {
+        updateLog(data.msg);
+      });
+      socket.on('someone is leaving '+valOf.pId, function(count){
+        updateUserCount(count);
+      });
+      socket.on('someone here '+valOf.pId,function(count){
+        updateUserCount(count);
+      });
     });
+  
     
     $('#send_comment').click(function(){
       if(!valOf.uname) {
@@ -239,8 +243,9 @@ script(type='text/javascript')
       if(!msg.body) {
         return false;
       }
-
-      socket.send({'type':'publish', 'channel':valOf.pId, 'msg':msg});
+      socket.emit('push log', {'channel':valOf.pId, 'msg':msg},function(data){
+        updateLog(data.msg);
+      });
       $("#comment").val('').focus();
     });
     
@@ -333,7 +338,7 @@ div.container.presentation
       em(data-emotion="Ask") #{askCnt} 
       label Ask
     li.last-child
-      em(data-emotion="Users") #{userCnt}
+      em(data-emotion="Users") 0
       label Users
   div#allUsers
     p By all 

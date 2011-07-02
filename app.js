@@ -7,36 +7,21 @@ var confName = 'test'
 					, {'name':'sdec', 'title':'SDEC 2011'}
 					, {'name':'jco', 'title':'JCO 2011'}];
 
-var express = require('express'),
-    io = require('socket.io'),
-    models = require('./lib/models'),
-    Comments = models.Comments,
-    Presentations = models.Presentations,
-    Users = models.Users,
-    uuid = require('node-uuid'),    
-    ss2  = require('./lib/ss2');
+var host = (process.env.VCAP_APP_HOST || 'localhost')
+  , port = (port=process.env.VCAP_APP_PORT || 11000)
+  , pageSize = 25
+  , express = require('express')
+  , sio = require('socket.io')
+  , models = require('./lib/models')
+  , Comments = models.Comments
+  , Presentations = models.Presentations
+  , Users = models.Users
+  , uuid = require('node-uuid')
+  , ss2  = require('./lib/ss2')
+  , app = module.exports = express.createServer()
+  , io = sio.listen(app);
+     
 
-var app = module.exports = express.createServer();
-var socket = io.listen(app);
-
-var host=process.env.VCAP_APP_HOST || 'localhost';
-var port=process.env.VCAP_APP_PORT || 11000;
-var pageSize = 25;
-                      
-var authentication = function(req,res,next){
-  if(ss2.isLogin(req)){
-    next();
-  }else{
-    res.redirect('/');
-  }
-};
-var authorization = function(req,res,next){
-  if(ss2.isAdmin(req)){
-    next();
-  }else{
-    res.redirect('/');
-  }  
-};
 // Configuration
 app.configure(function(){
   app.set('views', __dirname + '/views');
@@ -51,65 +36,89 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  io.enable('browser client etag');
+  io.set('log level', 1); // If you want logging, remove this line.
+  io.set('transports', [
+    'websocket'
+  , 'flashsocket'
+  , 'htmlfile'
+  , 'xhr-polling'
+  , 'jsonp-polling'
+  ]);
 });
 
 app.configure('production', function(){
   app.use(express.errorHandler());
+  io.enable('browser client minification');
+  io.enable('browser client etag');
+  io.set('log level', 1);
+  io.set('transports', [
+    'websocket'
+  , 'flashsocket'
+  , 'htmlfile'
+  , 'xhr-polling'
+  , 'jsonp-polling'
+  ]);
 });
 
-// Socket IO
-
-var channelMap = ss2.createHashMap();
-var clientKeyMap  = ss2.createHashMap();
-var removeClient = function(channalId,sessionId){
-  var _clentMap = channelMap.get(channalId||'');
-  _clentMap && !_clentMap.isEmpty() && _clentMap.remove(sessionId||'');
+var authentication = function(req,res,next){
+  if(ss2.isLogin(req)){
+    next();
+  }else{
+    res.redirect('/');
+  }
 };
-socket.on('connection', function(client){
-  var clientSessionId = client.sessionId;
-  client.on('message', function(message){
-    var channel = message.channel;
-    var action = message.type;
-    var msg = message.msg;
-    var clientMap = channelMap.get(channel);    
-    if(action === 'subscribe'){
-      if(clientMap === undefined) {
-        clientMap = ss2.createHashMap();
-        channelMap.put(channel, clientMap);
-      } 
-      if(message.sessionId){ 
-        removeClient(channel,message.sessionId);
-      }
-      clientMap.put(clientSessionId,client);
-      clientKeyMap.put(clientSessionId,channel);
-      
-      client.send({'checked':true,'sessionId':clientSessionId,'userCnt':clientMap.size()});
-      
-    } else if(action === 'publish') {
-      // save
-      var newComments = new Comments();
-      newComments.to = channel;
-      newComments.user.name = msg.user.name;
-      newComments.user.avatar = msg.user.avatar;
-      // newComments.from = msg.from;
-      newComments.body = msg.body;
-      newComments.emotion = msg.emotion;
-      newComments.date = (+new Date());
-      newComments.save(function(err){
-        // console.log(err);
-      });
-      // publish
-      var clients = channelMap.get(channel).getAll();
-      var userCnt = clientMap.size();
-      for(var sessionId in clients) {
-        clientMap.get(sessionId).send({'msg':newComments,'sessionId':sessionId,'userCnt':userCnt});
-      }
+var authorization = function(req,res,next){
+  if(ss2.isAdmin(req)){
+    next();
+  }else{
+    res.redirect('/');
+  }  
+};
+
+var channelStore = ss2.createHashMap();
+io.sockets.on('connection', function(socket){
+  var id = socket.id;
+  
+  socket.on('entrance',function(channelId,updatedFn){
+    socket.channelId = channelId;
+    var users = channelStore.get(channelId);
+    if(!users){
+      users = ss2.createHashMap();
+      channelStore.put(channelId,users);
     }
+    users.put(id,1);
+    var userCount = users.size();
+    updatedFn(userCount);
+    socket.broadcast.emit('someone here '+socket.channelId, userCount);
   });
-  client.on('disconnect', function(){
-    removeClient(clientKeyMap.get(clientSessionId),clientSessionId);
-    clientKeyMap.remove(clientSessionId);
+  
+  socket.on('push log', function(message,updateFn){
+    var channel = message.channel;
+    var msg = message.msg;
+    var newComments = new Comments();
+    newComments.to = channel;
+    newComments.user.name = msg.user.name;
+    newComments.user.avatar = msg.user.avatar;
+    newComments.body = msg.body;
+    newComments.emotion = msg.emotion;
+    newComments.date = (+new Date());
+    newComments.save(function(err){
+    });
+    updateFn({'msg':newComments});
+    socket.broadcast.emit('pull log '+channel, {'msg':newComments});
   });
+  
+  socket.on('disconnect', function () {
+    var users = channelStore.get(socket.channelId),
+        userCount = 1;
+    if(users){
+      users.remove(id);
+      userCount = users.size();
+    }
+    socket.broadcast.emit('someone is leaving '+socket.channelId, userCount);
+  });
+  
 });
 
 // Routes
@@ -219,8 +228,6 @@ app.get('/p/:id', authentication, function(req, res){
         if(!p){
           res.redirect('/list');
         } else {
-          var _clientMap = channelMap.get(req.params.id);
-          params['userCnt'] = (_clientMap && !_clientMap.isEmpty() && _clientMap.size()||1)||1;
           params.title = p.title;
           params.serverTime = (+new Date());
           res.render('presentation',params);
