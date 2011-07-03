@@ -145,7 +145,7 @@ app.get('/logout', authentication,function(req, res){
   res.redirect('/');
 });
 
-app.get('/list', authentication,function(req, res){
+app.get('/list', function(req, res){
   // get the presentation list
   Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
     res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':confTitle, 'histories':histories});
@@ -162,7 +162,7 @@ var getCurrentConfIndex = function(){
   return currentConfIndex;
 }
 
-app.get('/next', authentication, function(req, res){
+app.get('/next', function(req, res){
   var conf = '', currentConfIndex = getCurrentConfIndex();
   if(currentConfIndex !== histories.length-1) {
     conf = histories[++currentConfIndex];
@@ -174,7 +174,7 @@ app.get('/next', authentication, function(req, res){
   res.redirect("/list");
 });
 
-app.get('/prev', authentication, function(req, res){
+app.get('/prev', function(req, res){
   var conf = '', currentConfIndex = getCurrentConfIndex();
   if(currentConfIndex !== 0) {
     conf = histories[--currentConfIndex];
@@ -186,7 +186,7 @@ app.get('/prev', authentication, function(req, res){
   res.redirect("/list");
 });
 
-app.get('/curr', authentication, function(req, res){
+app.get('/curr', function(req, res){
   var conf = histories[0];
   confName = conf.name;
   confTitle = conf.title;
@@ -205,7 +205,7 @@ app.get('/comments', function(req, res){
   });
 });
 
-app.get('/p/:id', authentication, function(req, res){
+app.get('/p/:id', function(req, res){
   var params = {'port':port, 
                 'uname':ss2.getUname(req), 
                 'avatar':ss2.getAvatar(req),
