@@ -154,6 +154,8 @@ app.get('/:confName', function(req, res){
   var confName = req.params.confName;
   var conf = getConfByName(confName);
   Presentations.find({'conference':conf.name}).sort('body', 1).execFind(function(err, result){
+	console.log("so,ething is wrong but I'm too sleepy T,T");
+	console.log(result);
     res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':conf.title, 'histories':histories});
   });
 });
