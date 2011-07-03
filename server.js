@@ -146,20 +146,40 @@ app.get('/logout', authentication,function(req, res){
 });
 
 app.get('/list', function(req, res){
+  res.redirect('/'+confName);	
+});
+
+app.get('/:confName', function(req, res){
   // get the presentation list
-  Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
-    res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':confTitle, 'histories':histories});
+  var confName = req.params.confName;
+  var conf = getConfByName(confName);
+  Presentations.find({'conference':conf.name}).sort('body', 1).execFind(function(err, result){
+    res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':conf.title, 'histories':histories});
   });
 });
 
+var getConfByName = function(wantedConfName){
+	return histories[getCurrentConfIndex(wantedConfName)];
+}
+
 var getCurrentConfIndex = function(){
-  var currentConfIndex = 0;
+  var currentIndex = 0;
   histories.forEach(function(conf, index){
     if(conf.name === confName){
-      currentConfIndex = index;
+      currentIndex = index;
     }
   });
-  return currentConfIndex;
+  return currentIndex;
+}
+
+var getCurrentConfIndex = function(wantedConfName){
+  var currentIndex = 0;
+  histories.forEach(function(conf, index){
+    if(conf.name === wantedConfName){
+      currentIndex = index;
+    }
+  });
+  return currentIndex;
 }
 
 app.get('/next', function(req, res){
