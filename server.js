@@ -4,8 +4,9 @@
 var confName = 'ksug'
 	, confTitle = 'KSUG Flash Seminar'
 	, histories = [{'name':'ksug', 'title':'KSUG Flash Seminar'}
-					, {'name':'sdec', 'title':'SDEC 2011'}
-					, {'name':'jco', 'title':'JCO 2011'}];
+			 , {'name':'sdec', 'title':'SDEC 2011'}
+			 , {'name':'jco', 'title':'JCO 2011'}
+                         , {'test':'Live.log Test'}];
 
 var host = (process.env.VCAP_APP_HOST || 'localhost')
   , port = (port=process.env.VCAP_APP_PORT || 80)
@@ -146,17 +147,9 @@ app.get('/logout', authentication,function(req, res){
 });
 
 app.get('/list', function(req, res){
-  res.redirect('/'+confName);	
-});
-
-app.get('/:confName', function(req, res){
-  // get the presentation list
-  var confName = req.params.confName;
-  var conf = getConfByName(confName);
-  Presentations.find({'conference':conf.name}).sort('body', 1).execFind(function(err, result){
-	console.log("so,ething is wrong but I'm too sleepy T,T");
+  Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
 	console.log(result);
-    res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':conf.title, 'histories':histories});
+    res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':confTitle, 'histories':histories});
   });
 });
 
