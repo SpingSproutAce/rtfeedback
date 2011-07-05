@@ -148,7 +148,6 @@ app.get('/logout', authentication,function(req, res){
 
 app.get('/list', function(req, res){
   Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
-	console.log(result);
     res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':confTitle, 'histories':histories});
   });
 });
