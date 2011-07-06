@@ -9,6 +9,13 @@ div.container.center.index
      img(src='/images/sign-in-twitter.png')
     form#loginForm(method='post', action='/login')
       input(type='hidden', value=token, name='token')
+    h1='Histories'
+    ul.list.histories
+      - each conf in histories
+        - var link = '/list?conf=' + conf.name
+        - var confTitle = conf.title;
+        li
+          a(href=link) #{confTitle}
   div.footer
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout

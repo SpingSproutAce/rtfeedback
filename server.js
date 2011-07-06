@@ -1,12 +1,12 @@
 /**
  * Module dependencies.
  */
-var confName = 'ksug'
-	, confTitle = 'KSUG Flash Seminar'
-	, histories = [{'name':'ksug', 'title':'KSUG Flash Seminar'}
-			 , {'name':'sdec', 'title':'SDEC 2011'}
-			 , {'name':'jco', 'title':'JCO 2011'}
-                         , {'test':'Live.log Test'}];
+var confName = 'test'
+  , confTitle = 'Live.log Test'
+  , histories = [{'name':'test', 'title':'Live.log Test'}
+    , {'name':'sdec', 'title':'SDEC 2011'}
+    , {'name':'jco', 'title':'JCO 2011'}
+    , {'name':'ksug', 'title':'KSUG Flash Seminar'}];
 
 var host = (process.env.VCAP_APP_HOST || 'localhost')
   , port = (port=process.env.VCAP_APP_PORT || 80)
@@ -128,7 +128,7 @@ app.get('/',ss2.restoreUserFromCookie,ss2.getTwitterLoginUrl, function(req, res)
     res.redirect('list');
   } else {
     req.session.token = uuid();
-    res.render('index',{'token':req.session.token,'twitterLoginUrl':(req.session.twitter.twitterLoginUrl||'#')});
+    res.render('index',{'histories':histories, 'token':req.session.token,'twitterLoginUrl':(req.session.twitter.twitterLoginUrl||'#')});
   }
 });
 
@@ -147,8 +147,10 @@ app.get('/logout', authentication,function(req, res){
 });
 
 app.get('/list', function(req, res){
-  Presentations.find({'conference':confName}).sort('body', 1).execFind(function(err, result){
-    res.render('list', {'uname':ss2.getUname(req), 'result':result, 'confTitle':confTitle, 'histories':histories});
+  var confName = req.query.conf;
+  var conf = getConfByName(confName);
+  Presentations.find({'conference':conf.name}).sort('body', 1).execFind(function(err, result){
+    res.render('list', {'histories':histories, 'uname':ss2.getUname(req), 'result':result, 'conf':conf, 'histories':histories});
   });
 });
 
@@ -176,38 +178,6 @@ var getCurrentConfIndex = function(wantedConfName){
   return currentIndex;
 }
 
-app.get('/next', function(req, res){
-  var conf = '', currentConfIndex = getCurrentConfIndex();
-  if(currentConfIndex !== histories.length-1) {
-    conf = histories[++currentConfIndex];
-  } else {
-    conf = histories[0];
-  }
-  confName = conf.name;
-  confTitle = conf.title;
-  res.redirect("/list");
-});
-
-app.get('/prev', function(req, res){
-  var conf = '', currentConfIndex = getCurrentConfIndex();
-  if(currentConfIndex !== 0) {
-    conf = histories[--currentConfIndex];
-  } else {
-    conf = histories[histories.length-1];
-  }
-  confName = conf.name;
-  confTitle = conf.title;
-  res.redirect("/list");
-});
-
-app.get('/curr', function(req, res){
-  var conf = histories[0];
-  confName = conf.name;
-  confTitle = conf.title;
-  res.redirect("/list");	
-});
-
-
 app.get('/comments', function(req, res){
   res.contentType('application/json');
   if(req.query.date){
@@ -223,7 +193,8 @@ app.get('/p/:id', function(req, res){
   var params = {'port':port, 
                 'uname':ss2.getUname(req), 
                 'avatar':ss2.getAvatar(req),
-                'p_id':req.params.id, 
+                'p_id':req.params.id,
+                'conf':req.query.conf, 
                 'title':'',
                 'ngCnt'   : 0,
                 'goodCnt' : 0, 

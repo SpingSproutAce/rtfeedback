@@ -1,14 +1,21 @@
 div.container.center
   div.header
     h1 The 
-       | #{confTitle}
+       | #{conf.title}
        | '\s Schedules
   div.article
     ul.list
       - each p in result
-        - var link = '/p/' + p._id
+        - var link = '/p/' + p._id + '?conf=' + conf.name
         li
           a(href=link)  #{p.body} | #{p.speaker} | #{p.title}
+    h1='Histories'
+    ul.list.histories
+      - each conf in histories
+        - var link = '/list?conf=' + conf.name
+        - var confTitle = conf.title;
+        li
+          a(href=link) #{confTitle}
   div.footer
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout
