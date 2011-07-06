@@ -11,11 +11,9 @@ div.container.center
           a(href=link)  #{p.body} | #{p.speaker} | #{p.title}
     h1='Histories'
     ul.list.histories
-      - each conf in histories
-        - var link = '/list?conf=' + conf.name
-        - var confTitle = conf.title;
+      - each confTitle,confName in histories
         li
-          a(href=link) #{confTitle}
+          a(href='/list?conf=#{confName}') #{confTitle}
   div.footer
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout
