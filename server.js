@@ -3,13 +3,14 @@
  */
 var confName = 'test'
   , confTitle = 'Live.log Test'
-  , histories = [{'name':'test', 'title':'Live.log Test'}
-    , {'name':'sdec', 'title':'SDEC 2011'}
-    , {'name':'jco', 'title':'JCO 2011'}
-    , {'name':'ksug', 'title':'KSUG Flash Seminar'}];
+  , histories = {
+      'test':'Live.log Test'
+    , 'sdec': 'SDEC 2011'
+    , 'jco': 'JCO 2011'
+    , 'ksug': 'KSUG Flash Seminar'};
 
 var host = (process.env.VCAP_APP_HOST || 'localhost')
-  , port = (port=process.env.VCAP_APP_PORT || 80)
+  , port = (process.env.VCAP_APP_PORT || 80)
   , pageSize = 25
   , express = require('express')
   , sio = require('socket.io')
@@ -77,20 +78,6 @@ var authorization = function(req,res,next){
   }  
 };
 
-var getConfByName = function(wantedConfName){
-	return histories[getCurrentConfIndex(wantedConfName)];
-};
-
-var getCurrentConfIndex = function(wantedConfName){
-  var currentIndex = 0;
-  histories.forEach(function(conf, index){
-    if(conf.name === wantedConfName){
-      currentIndex = index;
-    }
-  });
-  return currentIndex;
-};
-
 var channelStore = ss2.createHashMap();
 io.sockets.on('connection', function(socket){
   var id = socket.id;
@@ -109,19 +96,20 @@ io.sockets.on('connection', function(socket){
   });
   
   socket.on('push log', function(message,updateFn){
-    var channel = message.channel;
-    var msg = message.msg;
-    var newComments = new Comments();
-    newComments.to = channel;
-    newComments.user.name = msg.user.name;
-    newComments.user.avatar = msg.user.avatar;
-    newComments.body = msg.body;
-    newComments.emotion = msg.emotion;
-    newComments.date = (+new Date());
-    newComments.save(function(err){
-    });
-    updateFn({'msg':newComments});
-    socket.broadcast.emit('pull log '+channel, {'msg':newComments});
+    if(!ss2.isGuest){
+      var channel = message.channel;
+      var msg = message.msg;
+      var newComments = new Comments();
+      newComments.to = channel;
+      newComments.user.name = msg.user.name;
+      newComments.user.avatar = msg.user.avatar;
+      newComments.body = msg.body;
+      newComments.emotion = msg.emotion;
+      newComments.date = (+new Date());
+      newComments.save(function(err){});
+      updateFn({'msg':newComments});
+      socket.broadcast.emit('pull log '+channel, {'msg':newComments});
+    }
   });
   
   socket.on('disconnect', function () {
@@ -161,10 +149,13 @@ app.get('/logout', authentication,function(req, res){
 });
 
 app.get('/list', function(req, res){
-  var confName = req.query.conf;
-  var conf = getConfByName(confName);
+  var conf = {'name':req.query.conf};
+  if(!ss2.hasKey(histories,conf.name)){
+    conf.name  = 'test';
+  }
+  conf.title = histories[conf.name];
   Presentations.find({'conference':conf.name}).sort('body', 1).execFind(function(err, result){
-    res.render('list', {'histories':histories, 'uname':ss2.getUname(req), 'result':result, 'conf':conf, 'histories':histories});
+    res.render('list', {'histories':histories, 'uname':ss2.getUname(req), 'result':result, 'conf':conf});
   });
 });
 
@@ -196,7 +187,8 @@ app.get('/p/:id', function(req, res){
                 'askPageCnt'  : 0, 
                 'allPageCnt'  : 0,
                 'allUserCnt'  : 0,
-                'allUsers'    :''
+                'allUsers'    :'',
+                'isGuest'     : ss2.isGuest(req) 
                },
     presentFn = function(){
       Presentations.findById(req.params.id, function(err, p){
