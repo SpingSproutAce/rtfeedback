@@ -18,8 +18,12 @@ div.container.center
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout
       &nbsp;&nbsp;
+    - if(uname!='anonymous')
       a(href='/logout', class="logout")
         b logout
+    - if(uname=='anonymous')
+      a(href='/', class="login")
+        b login
 script(src='/javascripts/jquery-1.6.1.min.js')
 script(type='text/javascript')
   $(function(){
