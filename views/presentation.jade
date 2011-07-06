@@ -360,9 +360,10 @@ div.container.presentation
       a(href="/comments/", data-emotion="!Good") !Good
     li
       a(href="/comments/", data-emotion="Ask") Ask
-  div(id="input_bar")
-    input(id='comment', name='comment',type="text", autocomplete='off')
-    button(id='send_comment') .push();
+  - if(!isGuest)
+    div(id="input_bar")
+      input(id='comment', name='comment',type="text", autocomplete='off')
+      button(id='send_comment') .push();
   ul#allList.rt_feedbacks
     li.loading
       strong Loading...
