@@ -77,6 +77,20 @@ var authorization = function(req,res,next){
   }  
 };
 
+var getConfByName = function(wantedConfName){
+	return histories[getCurrentConfIndex(wantedConfName)];
+};
+
+var getCurrentConfIndex = function(wantedConfName){
+  var currentIndex = 0;
+  histories.forEach(function(conf, index){
+    if(conf.name === wantedConfName){
+      currentIndex = index;
+    }
+  });
+  return currentIndex;
+};
+
 var channelStore = ss2.createHashMap();
 io.sockets.on('connection', function(socket){
   var id = socket.id;
@@ -153,30 +167,6 @@ app.get('/list', function(req, res){
     res.render('list', {'histories':histories, 'uname':ss2.getUname(req), 'result':result, 'conf':conf, 'histories':histories});
   });
 });
-
-var getConfByName = function(wantedConfName){
-	return histories[getCurrentConfIndex(wantedConfName)];
-}
-
-var getCurrentConfIndex = function(){
-  var currentIndex = 0;
-  histories.forEach(function(conf, index){
-    if(conf.name === confName){
-      currentIndex = index;
-    }
-  });
-  return currentIndex;
-}
-
-var getCurrentConfIndex = function(wantedConfName){
-  var currentIndex = 0;
-  histories.forEach(function(conf, index){
-    if(conf.name === wantedConfName){
-      currentIndex = index;
-    }
-  });
-  return currentIndex;
-}
 
 app.get('/comments', function(req, res){
   res.contentType('application/json');
