@@ -362,6 +362,7 @@ div.container.presentation
       a(href="/comments/", data-emotion="Ask") Ask
   - if(!isGuest)
     div(id="input_bar")
+      img(src='#{avatar}')
       input(id='comment', name='comment',type="text", autocomplete='off')
       button(id='send_comment') .push();
   ul#allList.rt_feedbacks
@@ -382,5 +383,9 @@ div.container.presentation
     small made by 
       a(href='http://springsprout.org' , target="_blank") springsprout
       &nbsp;&nbsp;
+    - if(uname!='anonymous')
       a(href='/logout', class="logout")
         b logout
+    - if(uname=='anonymous')
+      a(href='/', class="login")
+        b login
