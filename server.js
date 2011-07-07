@@ -96,20 +96,18 @@ io.sockets.on('connection', function(socket){
   });
   
   socket.on('push log', function(message,updateFn){
-    if(!ss2.isGuest){
-      var channel = message.channel;
-      var msg = message.msg;
-      var newComments = new Comments();
-      newComments.to = channel;
-      newComments.user.name = msg.user.name;
-      newComments.user.avatar = msg.user.avatar;
-      newComments.body = msg.body;
-      newComments.emotion = msg.emotion;
-      newComments.date = (+new Date());
-      newComments.save(function(err){});
-      updateFn({'msg':newComments});
-      socket.broadcast.emit('pull log '+channel, {'msg':newComments});
-    }
+    var channel = message.channel;
+    var msg = message.msg;
+    var newComments = new Comments();
+    newComments.to = channel;
+    newComments.user.name = msg.user.name;
+    newComments.user.avatar = msg.user.avatar;
+    newComments.body = msg.body;
+    newComments.emotion = msg.emotion;
+    newComments.date = (+new Date());
+    newComments.save(function(err){});
+    updateFn({'msg':newComments});
+    socket.broadcast.emit('pull log '+channel, {'msg':newComments});
   });
   
   socket.on('disconnect', function () {
