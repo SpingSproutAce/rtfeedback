@@ -278,6 +278,10 @@ ul#allList li[data-emotion="!Good"]{
   background-color: green;
 }
 
+ul#allList li[data-emotion="Ask"]{
+  background-color: yellow;
+}
+
 ul.rt_feedbacks {
 	padding: 5px;
 	margin-top: 30px;
