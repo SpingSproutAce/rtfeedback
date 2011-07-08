@@ -265,6 +265,19 @@ ol, ul {list-style: none; }
 ul#allList {
   display:block;
 }
+
+ul#allList li[data-emotion="*"]{
+  background-color: red;
+}
+
+ul#allList li[data-emotion="Good"]{
+  background-color: blue;	
+}
+
+ul#allList li[data-emotion="!Good"]{
+  background-color: green;
+}
+
 ul.rt_feedbacks {
 	padding: 5px;
 	margin-top: 30px;
