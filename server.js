@@ -345,6 +345,27 @@ app.get('/admin/:text', function(req, res){
 	}
 	res.redirect("/");
 });
-
+app.get('/down', function(req, res){
+  var filename = 'data.csv';
+  res.attachment(filename);
+  var data = "";
+  var getComment = function(presentations,cb){
+      var p = presentations.shift();
+      if(p === undefined){
+        res.end(data,'utf-8');
+        return false;
+      }
+      data += p.title;
+      Comments.find({'to':p._id}).sort('date', -1).execFind(function(err, comments){
+        comments.forEach(function(c){
+          data += c.emotion + ',' + c.user.name + ',' + c.body + '\n';
+        });
+        cb(presentations,getComment);
+      });
+  };
+  Presentations.find({'conference':req.query.conf}).sort('body', 1).execFind(function(err, presentations){
+    getComment(presentations, getComment);
+  });
+});
 app.listen(port);
 console.log("Express server listening on port %d", app.address().port);
