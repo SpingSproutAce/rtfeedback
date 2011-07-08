@@ -350,15 +350,19 @@ app.get('/down', function(req, res){
   res.attachment(filename);
   var data = "";
   Presentations.find({'conference':req.query.conf}).sort('body', 1).execFind(function(err, presentations){
+    var len = presentations.length;
+    var i = 0;
     presentations.forEach(function(p){
 	  data += p.title + '\n';
-	  Comments.find({'to':p.name}).sort('date', -1).execFind(function(err, comments){
+	  Comments.find({'to':p._id}).sort('date', -1).execFind(function(err, comments){
 		comments.forEach(function(c){
           data += c.emotion + ',' + c.user.name + ',' + c.body + '\n';
         });
+        i++;
+        if(i == len) res.send(data);
 	  });
     });
-    res.send(data);
+    // res.send(data);
   });
 });
 
