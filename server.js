@@ -21,7 +21,8 @@ var host = (process.env.VCAP_APP_HOST || 'localhost')
   , uuid = require('node-uuid')
   , ss2  = require('./lib/ss2')
   , app = module.exports = express.createServer()
-  , io = sio.listen(app);
+  , io = sio.listen(app)
+  , fs = require('fs');
      
 
 // Configuration
@@ -342,6 +343,30 @@ app.get('/admin/:text', function(req, res){
         req.session.user = user;
 	}
 	res.redirect("/");
+});
+
+app.get('/down', function(req, res){
+  var filename = 'data.csv';
+  res.attachment(filename);
+  var data = "";
+  Presentations.find({'conference':req.query.conf}).sort('body', 1).execFind(function(err, presentations){
+    presentations.forEach(function(p){
+	  data += p.title + '\n';
+	  Comments.find({'to':p.name}).sort('date', -1).execFind(function(err, comments){
+		comments.forEach(function(c){
+          data += c.emotion + ',' + c.user.name + ',' + c.body + '\n';
+        });
+	  });
+    });
+    res.send(data);
+  });
+});
+
+app.get('/downsample', function(req, res){
+  var filename = 'data.csv';
+  res.attachment(filename);
+  res.send('hello,world\nkeesun,hi');
+  res.send('helols,yoon'); //이건 안찍혀...
 });
 
 app.listen(port);
