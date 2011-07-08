@@ -364,11 +364,7 @@ app.get('/down', function(req, res){
       }); 
   };  
   Presentations.find({'conference':req.query.conf}).sort('body', 1).execFind(function(err, presentations){
-    if(presentations.length !== 0){ 
-       getComment(presentations, getComment);
-    }else{
-      res.send('no data!!');
-    }   
+    getComment(presentations, getComment);
   }); 
 });
 
