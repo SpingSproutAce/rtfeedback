@@ -348,28 +348,34 @@ app.get('/admin/:text', function(req, res){
 app.get('/down', function(req, res){
   var filename = 'data.csv';
   res.attachment(filename);
-  var data = "";
-  Presentations.find({'conference':req.query.conf}).sort('body', 1).execFind(function(err, presentations){
-    var len = presentations.length;
-    var i = 0;
-    presentations.forEach(function(p){
-	  data += p.title + '\n';
-	  Comments.find({'to':p._id}).sort('date', -1).execFind(function(err, comments){
-		comments.forEach(function(c){
+  var data = ""; 
+  var getComment = function(presentations,cb){
+      var p = presentations.shift();
+      if(p === undefined){
+        res.end(data,'utf-8');
+        return false;
+      }   
+      data += p.title + ',' + p.speaker + '\n';
+      Comments.find({'to':p._id}).sort('date', -1).execFind(function(err, comments){
+        comments.forEach(function(c){
           data += c.emotion + ',' + c.user.name + ',' + c.body + '\n';
-        });
-        i++;
-        if(i == len) res.send(data);
-	  });
-    });
-    // res.send(data);
-  });
+        }); 
+        cb(presentations,getComment);
+      }); 
+  };  
+  Presentations.find({'conference':req.query.conf}).sort('body', 1).execFind(function(err, presentations){
+    if(presentations.length !== 0){ 
+       getComment(presentations, getComment);
+    }else{
+      res.send('no data!!');
+    }   
+  }); 
 });
 
-app.get('/downsample', function(req, res){
+app.get('/ds', function(req, res){
   var filename = 'data.csv';
   res.attachment(filename);
-  res.send('hello,world\nkeesun,hi');
+  res.send('hello,world\n한글,hi');
   res.send('helols,yoon'); //이건 안찍혀...
 });
 
