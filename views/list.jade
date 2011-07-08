@@ -4,6 +4,7 @@ div.container.center
        | #{conf.title}
        | '\s Schedules
   div.article
+    a(href='/down?conf=#{conf.name}') Download
     ul.list
       - each p in result
         - var link = '/p/' + p._id + '?conf=' + conf.name
