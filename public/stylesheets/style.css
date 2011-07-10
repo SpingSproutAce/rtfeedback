@@ -266,20 +266,20 @@ ul#allList {
   display:block;
 }
 
-ul#allList li[data-emotion="*"]{
-  background-color: red;
+ul li[data-emotion="*"]{
+  border-right: 1px solid grey;
 }
 
-ul#allList li[data-emotion="Good"]{
-  background-color: blue;	
+ul li[data-emotion="Good"]{
+  border-right: 1px solid blue;
 }
 
-ul#allList li[data-emotion="!Good"]{
-  background-color: green;
+ul li[data-emotion="!Good"]{
+  border-right: 1px solid red;
 }
 
-ul#allList li[data-emotion="Ask"]{
-  background-color: yellow;
+ul li[data-emotion="Ask"]{
+  border-right: 1px solid green;
 }
 
 ul.rt_feedbacks {
