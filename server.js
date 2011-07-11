@@ -347,7 +347,9 @@ app.get('/admin/:text', function(req, res){
 
 app.get('/down', function(req, res){
   var filename = 'data.csv';
-  res.attachment(filename);
+  res.charset = 'UTF-8';
+  res.header('Content-Disposition', 'attachment; filename="data.csv"');
+  res.header('Content-Type', 'text/csv');
   var data = ""; 
   var getComment = function(presentations,cb){
       var p = presentations.shift();

@@ -265,6 +265,23 @@ ol, ul {list-style: none; }
 ul#allList {
   display:block;
 }
+
+ul li[data-emotion="*"]{
+  border-right: 1px solid grey;
+}
+
+ul li[data-emotion="Good"]{
+  border-right: 1px solid blue;
+}
+
+ul li[data-emotion="!Good"]{
+  border-right: 1px solid red;
+}
+
+ul li[data-emotion="Ask"]{
+  border-right: 1px solid green;
+}
+
 ul.rt_feedbacks {
 	padding: 5px;
 	margin-top: 30px;
