@@ -347,14 +347,15 @@ app.get('/admin/:text', function(req, res){
 
 app.get('/down', function(req, res){
   var filename = 'data.csv';
-  res.charset = 'UTF-8';
-  res.header('Content-Disposition', 'attachment; filename="data.csv"');
-  res.header('Content-Type', 'text/csv');
+  res.writeHead(200,{
+    'Content-Type' : 'text/cvs',
+    'Content-Disposition' : 'attachment; filename="data.csv"'
+  });
   var data = ""; 
   var getComment = function(presentations,cb){
       var p = presentations.shift();
       if(p === undefined){
-        res.end(data,'utf-8');
+        res.end(data,'utf8');
         return false;
       }   
       data += p.title + ',' + p.speaker + '\n';
@@ -373,8 +374,8 @@ app.get('/down', function(req, res){
 app.get('/ds', function(req, res){
   var filename = 'data.csv';
   res.attachment(filename);
-  res.send('hello,world\n한글,hi');
-  res.send('helols,yoon'); //이건 안찍혀...
+//  res.send('hello,world\n한글,hi');
+  res.send('helols,yoon, 한글'); //이건 안찍혀...
 });
 
 app.listen(port);
